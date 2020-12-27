@@ -257,6 +257,9 @@ public class NoteEditor extends AnkiActivity implements
 
     private Toolbar mToolbar;
 
+    //TODO: This is only set on edit currently, not on add.
+    private Long mCurrentModelId = null;
+
     // Use the same HTML if the same image is pasted multiple times.
     private HashMap<String, String> mPastedImageCache = new HashMap<>();
 
@@ -2444,6 +2447,13 @@ public class NoteEditor extends AnkiActivity implements
     @VisibleForTesting
     long getDeckId() {
         return mCurrentDid;
+    }
+
+    public long getModelId() {
+        if (mCurrentModelId != null) {
+            return mCurrentModelId;
+        }
+        return mEditorNote.model().getLong("id");
     }
 
 
