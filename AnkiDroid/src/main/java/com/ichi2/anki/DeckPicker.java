@@ -454,7 +454,6 @@ public class DeckPicker extends NavigationDrawerActivity implements
 
         //we need to restore here, as we need it before super.onCreate() is called.
         restoreWelcomeMessage(savedInstanceState);
-        handleStartup();
 
         // Then set theme and content view
         super.onCreate(savedInstanceState);
@@ -527,6 +526,8 @@ public class DeckPicker extends NavigationDrawerActivity implements
         mReviewSummaryTextView = findViewById(R.id.today_stats_text_view);
 
         mShortAnimDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        handleStartup();
     }
 
     /**
