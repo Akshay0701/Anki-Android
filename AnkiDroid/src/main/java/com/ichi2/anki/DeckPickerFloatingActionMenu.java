@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ichi2.libanki.Decks;
 import com.ichi2.ui.FixedEditText;
@@ -42,6 +41,7 @@ public class DeckPickerFloatingActionMenu {
     private boolean mIsFABOpen = false;
 
     private final DeckPicker mDeckPicker;
+    private LinearLayout mLinearLayout;
 
     public DeckPickerFloatingActionMenu(View view, DeckPicker deckPicker) {
         this.mDeckPicker = deckPicker;
@@ -53,6 +53,7 @@ public class DeckPickerFloatingActionMenu {
         mAddSharedButton = (FloatingActionButton)view.findViewById(R.id.add_shared_action);
         mAddDeckButton = (FloatingActionButton)view.findViewById(R.id.add_deck_action);
         mFabBGLayout = view.findViewById(R.id.fabBGLayout);
+        mLinearLayout = view.findViewById(R.id.deckpicker_view);
 
         mFabMain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,10 +78,9 @@ public class DeckPickerFloatingActionMenu {
                 closeFloatingActionMenu();
                 EditText mDialogEditText = new FixedEditText(mDeckPicker);
                 mDialogEditText.setSingleLine(true);
-                new MaterialDialog.Builder(mDeckPicker)
+                new MaterialEditTextDialog.Builder(mDeckPicker, mDialogEditText)
                         .title(R.string.new_deck)
                         .positiveText(R.string.dialog_ok)
-                        .customView(mDialogEditText, true)
                         .onPositive((dialog, which) -> {
                             String deckName = mDialogEditText.getText().toString();
                             if (Decks.isValidDeckName(deckName)) {
@@ -128,6 +128,7 @@ public class DeckPickerFloatingActionMenu {
 
 
     private void showFloatingActionMenu() {
+        mLinearLayout.setAlpha(0.5f);
         mIsFABOpen = true;
         if (!animationDisabled()) {
             // Show with animation
@@ -152,6 +153,7 @@ public class DeckPickerFloatingActionMenu {
     }
 
     protected void closeFloatingActionMenu() {
+        mLinearLayout.setAlpha(1f);
         mIsFABOpen = false;
         mFabBGLayout.setVisibility(View.GONE);
         if (!animationDisabled()) {

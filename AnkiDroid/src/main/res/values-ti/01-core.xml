@@ -116,6 +116,7 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">ናይባሓቂ ነዚ ጽሑፍ ከምኡ ውን ነዞም ካርድታትን ክትድምስስ ደሊኻ?\n%s</string>
     <string name="menu_select">ጽሑፍ ምረጽ</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">ኣብ %1$s ርአ</string>
     <string name="menu_mark_note">ጽሑፍ ምልክት ግበረሉ</string>
     <string name="menu_unmark_note">ምልክት ዝገበርካሉ ጽሑፍ ምልክቱ ደምስስ</string>
@@ -154,6 +155,7 @@
     <string name="custom_study_deck_name">መጽናዕቲ ብዝጠዕም ምምዕርራይ</string>
     <string name="custom_study_deck_exists">መጀመርያ ዝነበረ ምምዕርራይ መጽናዕቲ ባይታ ከምባሓዱሽ ሰዩም።</string>
     <string name="empty_deck">እዚ ባይታ እዚ ጥርሑ እዩ ዘሎ።</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">ባይታ ጥርሑ ኣሎ። መልጎም + ጠውቅ ሓዲሽ ትሕዝቶ ክትውስኹ።</string>

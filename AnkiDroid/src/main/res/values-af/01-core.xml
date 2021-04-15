@@ -116,6 +116,7 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Verwyder regtig hierdie nota en al die samegaande karte?\n%s</string>
     <string name="menu_select">Kies teks</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Soek in %1$s</string>
     <string name="menu_mark_note">Merk nota</string>
     <string name="menu_unmark_note">Unmark note</string>
@@ -154,6 +155,7 @@
     <string name="custom_study_deck_name">Pasmaak studie sessie</string>
     <string name="custom_study_deck_exists">Hernoem die bestaande pasmaak kaartpak eers</string>
     <string name="empty_deck">Hierdie pak is leeg</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">Hierdie pak is leeg. Druk die + knoppie om nuwe inhoud by te voeg.</string>

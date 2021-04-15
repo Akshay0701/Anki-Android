@@ -111,6 +111,7 @@
     <string name="menu_edit_tags">Edit tag</string>
     <string name="delete_note_message">Yakin akan menghapus catatan ini dan semua kartunya?\n%s</string>
     <string name="menu_select">Pilih teks</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Pencarian di %1$s</string>
     <string name="menu_mark_note">Tandai catatan</string>
     <string name="menu_unmark_note">Batal tandai catatan</string>
@@ -149,6 +150,7 @@
     <string name="custom_study_deck_name">Sesi belajar kustom</string>
     <string name="custom_study_deck_exists">Ubah nama dek belajar kustom yang ada</string>
     <string name="empty_deck">Dek ini kosong</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Nama dek tidak valid</string>
     <string name="studyoptions_empty">Dek Ini kosong. Tekan tombol + untuk menambah konten baru.</string>

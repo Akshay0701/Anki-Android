@@ -116,6 +116,7 @@
     <string name="menu_edit_tags">Редакция на етикети</string>
     <string name="delete_note_message">Наистина изтрий тази бележка и всичките и карти? \n%s</string>
     <string name="menu_select">Избор на текст</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Търсене в %1$s</string>
     <string name="menu_mark_note">Маркирай бележка</string>
     <string name="menu_unmark_note">Размаркирай бележка</string>
@@ -154,6 +155,7 @@
     <string name="custom_study_deck_name">Допълнително време за учене</string>
     <string name="custom_study_deck_exists">Първо преименувайте съществуващото тесте за учене</string>
     <string name="empty_deck">Това тесте е празно</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Добавяне на карта</string>
     <string name="invalid_deck_name">Невалидно име на тесте</string>
     <string name="studyoptions_empty">Това тесте е празно. Натиснете бутона + за добавяне на ново съдържание.</string>

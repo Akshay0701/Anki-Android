@@ -121,6 +121,7 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Tiešām dzēst šo piezīmi un visas pievienotās kārtis?\n%s</string>
     <string name="menu_select">Iezīmēt tekstu</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Meklēt iekš %1$s</string>
     <string name="menu_mark_note">Mark note</string>
     <string name="menu_unmark_note">Unmark note</string>
@@ -159,6 +160,7 @@
     <string name="custom_study_deck_name">Pielāgota pētījuma sesija</string>
     <string name="custom_study_deck_exists">Lūdzu vispirms pārsauciet eksistējošo Pielāgoto pētījuma Deku.</string>
     <string name="empty_deck">This deck is empty</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">This deck is empty. Press the + button to add new content.</string>
