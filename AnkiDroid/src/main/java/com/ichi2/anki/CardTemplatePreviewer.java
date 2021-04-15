@@ -31,11 +31,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import timber.log.Timber;
 
-import static com.ichi2.anim.ActivityTransitionAnimation.Direction.END;
+import static com.ichi2.anim.ActivityTransitionAnimation.Direction.RIGHT;
 
 /**
  * The card template previewer intent must supply one or more cards to show and the index in the list from where
@@ -111,7 +110,7 @@ public class CardTemplatePreviewer extends AbstractFlashcardViewer {
         Timber.d("CardTemplatePreviewer:: closeCardTemplatePreviewer()");
         setResult(RESULT_OK);
         TemporaryModel.clearTempModelFiles();
-        finishWithAnimation(END);
+        finishWithAnimation(RIGHT);
     }
 
 
@@ -125,7 +124,7 @@ public class CardTemplatePreviewer extends AbstractFlashcardViewer {
     @Override
     protected void performReload() {
         // This should not happen.
-        finishWithAnimation(END);
+        finishWithAnimation(RIGHT);
     }
 
 
@@ -281,7 +280,9 @@ public class CardTemplatePreviewer extends AbstractFlashcardViewer {
         }
         try {
             JSONObject template = model.getJSONArray("tmpls").getJSONObject(ordinal);
-            return getCol().getNewLinkedCard(new PreviewerCard(getCol(), n), n, template, 1, 0L, false);
+            PreviewerCard card = (PreviewerCard)getCol().getNewLinkedCard(new PreviewerCard(getCol()), n, template, 1, 0L, false);
+            card.setNote(n);
+            return card;
         } catch (Exception e) {
             Timber.e("getDummyCard() unable to create card");
         }
@@ -292,18 +293,16 @@ public class CardTemplatePreviewer extends AbstractFlashcardViewer {
     /** Override certain aspects of Card behavior so we may display unsaved data */
     public class PreviewerCard extends Card {
 
-        @Nullable private final Note mNote;
+        private Note mNote;
 
 
-        private PreviewerCard(Collection col, @NonNull Note note) {
+        private PreviewerCard(Collection col) {
             super(col);
-            mNote = note;
         }
 
 
         private PreviewerCard(Collection col, long id) {
             super(col, id);
-            mNote = null;
         }
 
 
@@ -324,6 +323,12 @@ public class CardTemplatePreviewer extends AbstractFlashcardViewer {
                 return mNote;
             }
             return super.note();
+        }
+
+
+        /** set an unsaved note to use for rendering */
+        public void setNote(Note note) {
+            mNote = note;
         }
 
 

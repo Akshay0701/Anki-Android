@@ -16,70 +16,39 @@
 
 package com.ichi2.anki.dialogs;
 
-import android.os.Bundle;
+import android.content.Intent;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.ichi2.anki.R;
+import com.ichi2.anki.AnkiActivity;
+import com.ichi2.anki.CardTemplateBrowserAppearanceEditor;
 import com.ichi2.anki.RobolectricTest;
-import com.ichi2.anki.dialogs.customstudy.CustomStudyDialog;
-import com.ichi2.anki.dialogs.customstudy.CustomStudyDialog.CustomStudyListener;
-import com.ichi2.anki.dialogs.customstudy.CustomStudyDialogFactory;
-import com.ichi2.libanki.Collection;
+import com.ichi2.anki.dialogs.CustomStudyDialog.CustomStudyListener;
 import com.ichi2.libanki.Deck;
-import com.ichi2.libanki.sched.AbstractSched;
+import com.ichi2.utils.JSONObject;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.robolectric.annotation.Config;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import static com.ichi2.libanki.Consts.DECK_DYN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.mockito.Mockito.*;
 
 @RunWith(AndroidJUnit4.class)
 public class CustomStudyDialogTest extends RobolectricTest {
 
-    CustomStudyListener mockListener;
-
-
-    @Override
-    public void setUp() {
-        super.setUp();
-        mockListener = mock(CustomStudyListener.class);
-    }
-
-
-    @Override
-    @After
-    public void tearDown() {
-        super.tearDown();
-        reset(mockListener);
-    }
-
-
-    private static <T> T whatever() {
-        return null;
-    }
-
     @Test
     public void learnAheadCardsRegressionTest() {
         // #6289 - Regression Test
-        Bundle args = new CustomStudyDialog(whatever(), whatever())
-                .withArguments(CustomStudyDialog.CUSTOM_STUDY_AHEAD, 1)
-                .getArguments();
+        CustomStudyDialog args = CustomStudyDialog.newInstance(CustomStudyDialog.CUSTOM_STUDY_AHEAD, 1);
 
-
-        CustomStudyDialogFactory factory = new CustomStudyDialogFactory(this::getCol, mockListener);
-        FragmentScenario<CustomStudyDialog> scenario = FragmentScenario.launch(CustomStudyDialog.class, args, factory);
+        FragmentScenario<CustomStudyDialogForTesting> scenario = getDialogScenario(args);
 
         scenario.moveToState(Lifecycle.State.STARTED);
 
@@ -102,34 +71,44 @@ public class CustomStudyDialogTest extends RobolectricTest {
     }
 
 
-    @Test
-    @Config(qualifiers = "en")
-    public void increaseNewCardLimitRegressionTest(){
-        // #8338 - Regression Test
-        Bundle args = new CustomStudyDialog(whatever(), whatever())
-                .withArguments(CustomStudyDialog.CONTEXT_MENU_STANDARD, 1)
-                .getArguments();
+    @NonNull
+    private FragmentScenario<CustomStudyDialogForTesting> getDialogScenario(CustomStudyDialog args) {
+        FragmentScenario<CustomStudyDialogForTesting> scenario = FragmentScenario.launch(CustomStudyDialogForTesting.class, args.getArguments());
 
-        // we are using mock collection for the CustomStudyDialog but still other parts of the code
-        // access a real collection, so we must ensure that collection is loaded first
-        // so we don't get net/ankiweb/rsdroid/BackendException$BackendDbException$BackendDbLockedException
-        ensureCollectionLoadIsSynchronous();
+        // Pick an arbitrary easy activity
+        CustomStudyActivity d = super.startActivityNormallyOpenCollectionWithIntent(CustomStudyActivity.class, new Intent());
 
-        Collection mockCollection = mock(Collection.class, Mockito.RETURNS_DEEP_STUBS);
-        AbstractSched mockSched = mock(AbstractSched.class);
-        when(mockCollection.getSched()).thenReturn(mockSched);
-        when(mockSched.newCount()).thenReturn(0);
+        scenario.onFragment(f -> f.setActivity(d));
+        return scenario;
+    }
+
+    private static class CustomStudyActivity extends CardTemplateBrowserAppearanceEditor implements CustomStudyListener {
+
+        @Override
+        public void onCreateCustomStudySession() {
+            // Intentionally blank
+        }
 
 
-        CustomStudyDialogFactory factory = new CustomStudyDialogFactory(() -> mockCollection, mockListener);
-        FragmentScenario<CustomStudyDialog> scenario = FragmentScenario.launch(CustomStudyDialog.class, args, R.style.Theme_AppCompat, factory);
+        @Override
+        public void onExtendStudyLimits() {
+            // Intentionally blank
+        }
+    }
 
-        scenario.moveToState(Lifecycle.State.STARTED);
 
-        scenario.onFragment(f -> {
-            MaterialDialog dialog = (MaterialDialog)f.getDialog();
-            assertThat(dialog,notNullValue());
-            assertThat(dialog.getItems(), Matchers.not(Matchers.hasItem(getResourceString(R.string.custom_study_increase_new_limit))));
-        });
+    public static class CustomStudyDialogForTesting extends CustomStudyDialog {
+        private AnkiActivity mAnkiActivity;
+
+        @SuppressWarnings("WeakerAccess")
+        public <T extends AnkiActivity & CustomStudyListener> void setActivity(T ankiActivity) {
+            mAnkiActivity = ankiActivity;
+        }
+
+
+        @Override
+        protected AnkiActivity getAnkiActivity() {
+            return mAnkiActivity;
+        }
     }
 }

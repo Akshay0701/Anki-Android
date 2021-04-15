@@ -25,6 +25,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.snackbar.Snackbar;
@@ -58,8 +59,8 @@ public class ReadText {
     public static void speak(String text, String loc, int queueMode) {
         int result = mTts.setLanguage(localeFromStringIgnoringScriptAndExtensions(loc));
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            UIUtils.showThemedToast(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message)
-                    + " (" + loc + ")", false);
+            Toast.makeText(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message)
+                    + " (" + loc + ")", Toast.LENGTH_LONG).show();
             Timber.e("Error loading locale %s", loc);
         } else {
             if (mTts.isSpeaking() && queueMode == TextToSpeech.QUEUE_FLUSH) {
@@ -212,8 +213,8 @@ public class ReadText {
         if (!originalLocaleCode.isEmpty()) {
             // (after notifying them first that no TTS voice was found for the locale
             // they originally requested)
-            UIUtils.showThemedToast(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message)
-                    + " (" + originalLocaleCode + ")", false);
+            Toast.makeText(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message)
+                    + " (" + originalLocaleCode + ")", Toast.LENGTH_LONG).show();
         }
         selectTts(mTextToSpeak, mDid, mOrd, mQuestionAnswer);
     }
@@ -276,7 +277,7 @@ public class ReadText {
                     Timber.d("TTS initialized and available languages found");
                     ((AbstractFlashcardViewer) mReviewer.get()).ttsInitialized();
                 } else {
-                    UIUtils.showThemedToast(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message), false);
+                    Toast.makeText(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message), Toast.LENGTH_LONG).show();
                     Timber.w("TTS initialized but no available languages found");
                 }
                 mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
@@ -302,12 +303,12 @@ public class ReadText {
                     }
                 });
             } else {
-                UIUtils.showThemedToast(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message), false);
+                Toast.makeText(mReviewer.get(), mReviewer.get().getString(R.string.no_tts_available_message), Toast.LENGTH_LONG).show();
                 Timber.w("TTS not successfully initialized");
             }
         });
         // Show toast that it's getting initialized, as it can take a while before the sound plays the first time
-        UIUtils.showThemedToast(context, context.getString(R.string.initializing_tts), false);
+        Toast.makeText(context, context.getString(R.string.initializing_tts), Toast.LENGTH_LONG).show();
     }
 
 

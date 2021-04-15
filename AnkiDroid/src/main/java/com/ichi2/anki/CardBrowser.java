@@ -139,7 +139,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
     * When the list is changed, the position member of its elements should get changed.*/
     @NonNull
     private CardCollection<CardCache> mCards = new CardCollection<>();
-    private List<Deck> mDropDownDecks;
+    private ArrayList<Deck> mDropDownDecks;
     private ListView mCardsListView;
     private SearchView mSearchView;
     private MultiColumnListAdapter mCardsAdapter;
@@ -241,7 +241,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
                 return true;
             };
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+
     protected void changeCardOrder(int which) {
         if (which != mOrder) {
             mOrder = which;
@@ -267,8 +267,6 @@ public class CardBrowser extends NavigationDrawerActivity implements
             mCards.reverse();
             updateList();
         }
-        // To update the collection
-        getCol().getDb().setMod(true);
     }
 
 
@@ -791,7 +789,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
         Intent editCard = new Intent(this, NoteEditor.class);
         editCard.putExtra(NoteEditor.EXTRA_CALLER, NoteEditor.CALLER_CARDBROWSER_EDIT);
         editCard.putExtra(NoteEditor.EXTRA_CARD_ID, sCardBrowserCard.getId());
-        startActivityForResultWithAnimation(editCard, EDIT_CARD, START);
+        startActivityForResultWithAnimation(editCard, EDIT_CARD, LEFT);
         //#6432 - FIXME - onCreateOptionsMenu crashes if receiving an activity result from edit card when in multiselect
         endMultiSelectMode();
     }
@@ -1319,7 +1317,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
             try {
                 arrayAdapter.add(deck.getString("name"));
             } catch (JSONException e) {
-                Timber.w(e);
+                e.printStackTrace();
             }
         }
 
@@ -1342,7 +1340,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
     }
 
     private void addNoteFromCardBrowser() {
-        startActivityForResultWithAnimation(getAddNoteIntent(), ADD_NOTE, START);
+        startActivityForResultWithAnimation(getAddNoteIntent(), ADD_NOTE, LEFT);
     }
 
 
@@ -1502,12 +1500,9 @@ public class CardBrowser extends NavigationDrawerActivity implements
             mSearchItem.expandActionView();
         }
         if (mSearchTerms.contains("deck:")) {
-            searchText = "(" + mSearchTerms + ")";
+            searchText = mSearchTerms;
         } else {
-            if (!"".equals(mSearchTerms))
-                searchText = mRestrictOnDeck + "(" + mSearchTerms + ")";
-            else
-                searchText = mRestrictOnDeck;
+            searchText = mRestrictOnDeck + mSearchTerms;
         }
         if (colIsOpen() && mCardsAdapter!= null) {
             // clear the existing card list
@@ -2178,7 +2173,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
     private void closeCardBrowser(int result, Intent data) {
         // Set result and finish
         setResult(result, data);
-        finishWithAnimation(END);
+        finishWithAnimation(RIGHT);
     }
 
     /**
@@ -2340,7 +2335,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
 
 
         @Override
-        public CardCache getItem(int position) {
+        public Object getItem(int position) {
             return getCards().get(position);
         }
 
@@ -2893,11 +2888,5 @@ public class CardBrowser extends NavigationDrawerActivity implements
     void replaceSelectionWith(int[] positions) {
         mCheckedCards.clear();
         checkCardsAtPositions(positions);
-    }
-
-    @VisibleForTesting
-    void searchCards(String searchQuery) {
-        mSearchTerms = searchQuery;
-        searchCards();
     }
 }

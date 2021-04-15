@@ -67,7 +67,7 @@ public class NoteService {
             }
         } catch (JSONException e) {
             // TODO Auto-generated catch block
-            Timber.w(e);
+            e.printStackTrace();
         }
         return null;
     }

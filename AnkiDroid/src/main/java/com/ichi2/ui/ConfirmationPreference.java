@@ -22,8 +22,8 @@ import android.util.AttributeSet;
 @SuppressWarnings("deprecation") // TODO Tracked in https://github.com/ankidroid/Anki-Android/issues/5019
 public class ConfirmationPreference extends android.preference.DialogPreference {
 
-    private Runnable mCancelHandler = () -> { /* do nothing by default */ };
-    private Runnable mOkHandler = () -> { /* do nothing by default */ };
+    private Runnable cancelHandler = () -> { /* do nothing by default */ };
+    private Runnable okHandler = () -> { /* do nothing by default */ };
 
     public ConfirmationPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -31,21 +31,21 @@ public class ConfirmationPreference extends android.preference.DialogPreference 
 
 
     public void setCancelHandler(Runnable cancelHandler) {
-        this.mCancelHandler = cancelHandler;
+        this.cancelHandler = cancelHandler;
     }
 
 
     public void setOkHandler(Runnable okHandler) {
-        this.mOkHandler = okHandler;
+        this.okHandler = okHandler;
     }
 
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
-            mOkHandler.run();
+            okHandler.run();
         } else {
-            mCancelHandler.run();
+            cancelHandler.run();
         }
     }
 }

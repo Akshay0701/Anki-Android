@@ -42,7 +42,7 @@ public class TypedAnswer {
         String answerText = matcher.replaceAll("");
         matcher = sBrPattern.matcher(answerText);
         answerText = matcher.replaceAll("\n");
-        matcher = Sound.SOUND_PATTERN.matcher(answerText);
+        matcher = Sound.sSoundPattern.matcher(answerText);
         answerText = matcher.replaceAll("");
         return Utils.nfcNormalized(answerText);
     }

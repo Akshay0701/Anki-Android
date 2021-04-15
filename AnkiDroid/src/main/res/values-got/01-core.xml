@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Wileizu bi sunjai þo melein jah allos kartos is usniman?\n%s</string>
     <string name="menu_select">Walei bokos</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Gasokei in %1$s</string>
     <string name="menu_mark_note">Gatarhei melein</string>
     <string name="menu_unmark_note">Ungatarhei melein</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">Anþara laiseinasaisjo</string>
     <string name="custom_study_deck_exists">Gif þata frumist niujata namo du wisandon laiseinawikon</string>
     <string name="empty_deck">This deck is empty</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">This deck is empty. Press the + button to add new content.</string>

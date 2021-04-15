@@ -186,7 +186,7 @@ public class BackupManager {
                     }
                     Timber.i("Backup created succesfully");
                 } catch (IOException e) {
-                    Timber.w(e);
+                    e.printStackTrace();
                 }
             }
         };

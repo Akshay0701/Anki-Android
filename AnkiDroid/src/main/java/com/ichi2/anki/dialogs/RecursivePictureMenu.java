@@ -17,6 +17,7 @@
 package com.ichi2.anki.dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -146,12 +147,12 @@ public class RecursivePictureMenu extends DialogFragment {
         private final int mText;
         @DrawableRes
         private final int mIcon;
-        private final String mAnalyticsId;
+        private final String analyticsId;
 
         public Item(@StringRes int titleString, @DrawableRes int iconDrawable, String analyticsId) {
             this.mText = titleString;
             this.mIcon = iconDrawable;
-            this.mAnalyticsId = analyticsId;
+            this.analyticsId = analyticsId;
         }
 
         public List<Item> getChildren() {
@@ -161,7 +162,7 @@ public class RecursivePictureMenu extends DialogFragment {
         protected Item(Parcel in) {
             mText = in.readInt();
             mIcon = in.readInt();
-            mAnalyticsId = in.readString();
+            analyticsId = in.readString();
         }
 
         @StringRes
@@ -178,13 +179,13 @@ public class RecursivePictureMenu extends DialogFragment {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(mText);
             dest.writeInt(mIcon);
-            dest.writeString(mAnalyticsId);
+            dest.writeString(analyticsId);
         }
 
         protected abstract void onClicked(AnkiActivity activity);
 
         public final void sendAnalytics() {
-            UsageAnalytics.sendAnalyticsEvent(UsageAnalytics.Category.LINK_CLICKED, mAnalyticsId);
+            UsageAnalytics.sendAnalyticsEvent(UsageAnalytics.Category.LINK_CLICKED, analyticsId);
         }
 
         /* This method calls onClicked method to handle click event in a suitable manner and

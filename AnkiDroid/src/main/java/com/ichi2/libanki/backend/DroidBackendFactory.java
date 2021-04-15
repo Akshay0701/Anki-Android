@@ -23,16 +23,11 @@ import net.ankiweb.rsdroid.BackendFactory;
 import net.ankiweb.rsdroid.RustBackendFailedException;
 import net.ankiweb.rsdroid.RustCleanup;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import timber.log.Timber;
 
 /** Responsible for selection of either the Rust or Java-based backend */
 public class DroidBackendFactory {
-
-    private static DroidBackend sBackendForTesting;
-
 
     /** Intentionally private - use {@link DroidBackendFactory#getInstance(boolean)}} */
     private DroidBackendFactory() {
@@ -43,12 +38,8 @@ public class DroidBackendFactory {
      * Obtains an instance of a {@link DroidBackend}.
      * Each call to this method will generate a separate instance which can handle a new Anki collection
      */
-    @NonNull
     @RustCleanup("Change back to a constant SYNC_VER")
     public static DroidBackend getInstance(boolean useBackend) {
-        if (sBackendForTesting != null) {
-            return sBackendForTesting;
-        }
 
         BackendFactory backendFactory = null;
         if (useBackend) {
@@ -72,10 +63,5 @@ public class DroidBackendFactory {
         } else {
             return new RustDroidBackend(backendFactory);
         }
-    }
-
-    @VisibleForTesting
-    public static void setOverride(DroidBackend backend) {
-        sBackendForTesting = backend;
     }
 }

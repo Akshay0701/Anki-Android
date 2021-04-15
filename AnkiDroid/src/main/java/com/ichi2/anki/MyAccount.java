@@ -19,14 +19,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.KeyEvent;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -65,6 +65,7 @@ public class MyAccount extends AnkiActivity {
     Toolbar mToolbar = null;
     private TextInputLayout mPasswordLayout;
 
+    private OrientationEventListener myOrientationEventListener;
     private ImageView mAnkidroidLogo;
 
     private void switchToState(int newState) {
@@ -116,11 +117,8 @@ public class MyAccount extends AnkiActivity {
             switchToState(STATE_LOG_IN);
         }
 
-        if (isScreenSmall() && this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mAnkidroidLogo.setVisibility(View.GONE);
-        } else {
-            mAnkidroidLogo.setVisibility(View.VISIBLE);
-        }
+        // listener for handling future change in orientation
+        initializeOrientationListener();
     }
 
 
@@ -130,7 +128,7 @@ public class MyAccount extends AnkiActivity {
 
         if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
             Timber.i("Attempting auto-login");
-            Connection.login(mLoginListener, new Connection.Payload(new Object[]{username, password,
+            Connection.login(loginListener, new Connection.Payload(new Object[]{username, password,
                     HostNumFactory.getInstance(this) }));
         } else {
             Timber.i("Auto-login cancelled - username/password missing");
@@ -168,7 +166,7 @@ public class MyAccount extends AnkiActivity {
         }
 
         if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
-            Connection.login(mLoginListener, new Connection.Payload(new Object[]{username, password,
+            Connection.login(loginListener, new Connection.Payload(new Object[]{username, password,
                     HostNumFactory.getInstance(this) }));
         } else {
             UIUtils.showSimpleSnackbar(this, R.string.invalid_username_password, true);
@@ -245,7 +243,7 @@ public class MyAccount extends AnkiActivity {
     /**
      * Listeners
      */
-    final Connection.TaskListener mLoginListener = new Connection.TaskListener() {
+    final Connection.TaskListener loginListener = new Connection.TaskListener() {
 
         @Override
         public void onProgressUpdate(Object... values) {
@@ -321,21 +319,48 @@ public class MyAccount extends AnkiActivity {
         return exception.getLocalizedMessage();
     }
 
-    private boolean isScreenSmall() {
-        return (this.getApplicationContext().getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                < Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (isScreenSmall() && newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+    public void handleCurrentOrientationState(int orientation) {
+        if ((orientation == Configuration.ORIENTATION_UNDEFINED) || orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mAnkidroidLogo.setVisibility(View.GONE);
         } else {
             mAnkidroidLogo.setVisibility(View.VISIBLE);
         }
     }
+
+    public void checkOrientation(int orientation) {
+        // if device is in horizontal mode then screen might not have enough space for ankidroid logo
+        // so we will invisible logo for horizontal mode only
+        if ((orientation == OrientationEventListener.ORIENTATION_UNKNOWN) || (orientation < 100) || (orientation > 280)) {
+            mAnkidroidLogo.setVisibility(View.GONE);
+        } else {
+            mAnkidroidLogo.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void initializeOrientationListener() {
+        myOrientationEventListener = new OrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                checkOrientation(orientation);
+            }
+        };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // handle current state
+        handleCurrentOrientationState(getResources().getConfiguration().orientation);
+        myOrientationEventListener.enable();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        myOrientationEventListener.disable();
+    }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -346,4 +371,5 @@ public class MyAccount extends AnkiActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
 }

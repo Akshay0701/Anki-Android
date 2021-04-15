@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">সত্যি এই নোট এবং এর কার্ড মুছবেন? \n%s</string>
     <string name="menu_select">টেক্সট নির্বাচন করুন</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">অনুসন্ধান করুন %1$s</string>
     <string name="menu_mark_note">টীকা চিহ্ন</string>
     <string name="menu_unmark_note">নোটের টীকা চিহ্ন মুছুন</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">নিজস্ব গবেষণা অধিবেশন</string>
     <string name="custom_study_deck_exists">বর্তমান স্বনির্ধারিত গবেষণা ডেক প্রথম পুনঃনামকরণ করুন</string>
     <string name="empty_deck">এই ডেক ফাঁকা।</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">এই ডেক খালি আছে। প্রেস + বাটন নতুন উপাদান যোগ করতে।</string>

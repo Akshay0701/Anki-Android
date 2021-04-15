@@ -48,7 +48,7 @@ package com.ichi2.utils;
    Similar to JSONException in meaning, but unchecked */
 public class JSONException extends RuntimeException {
 
-    private JSONException mExc = null;
+    private JSONException exc = null;
 
     public JSONException(String s) {
         super(s);
@@ -64,12 +64,12 @@ public class JSONException extends RuntimeException {
 
     public JSONException(JSONException e) {
         super(e);
-        mExc = e;
+        exc = e;
     }
 
     public JSONException asException() {
-        if (mExc !=null) {
-            return mExc;
+        if (exc!=null) {
+            return exc;
         } else {
             return new JSONException(toString());
         }

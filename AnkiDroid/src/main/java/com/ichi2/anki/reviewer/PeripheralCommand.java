@@ -38,7 +38,7 @@ public class PeripheralCommand {
 
     private final @ViewerCommandDef int mCommand;
 
-    private final ModifierKeys mModifierKeys;
+    private final ModifierKeys modifierKeys;
 
 
     private PeripheralCommand(int keyCode, @ViewerCommandDef int command, @NonNull CardSide side, ModifierKeys modifierKeys) {
@@ -46,11 +46,11 @@ public class PeripheralCommand {
         this.mUnicodeCharacter = null;
         this.mCommand = command;
         this.mCardSide = side;
-        this.mModifierKeys = modifierKeys;
+        this.modifierKeys = modifierKeys;
     }
 
     private PeripheralCommand(@Nullable Character unicodeCharacter, @ViewerCommandDef int command, @NonNull CardSide side, ModifierKeys modifierKeys) {
-        this.mModifierKeys = modifierKeys;
+        this.modifierKeys = modifierKeys;
         this.mKeyCode = null;
         this.mUnicodeCharacter = unicodeCharacter;
         this.mCommand = command;
@@ -148,7 +148,7 @@ public class PeripheralCommand {
 
 
     public boolean matchesModifier(KeyEvent event) {
-        return mModifierKeys.matches(event);
+        return modifierKeys.matches(event);
     }
 
 

@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.text.format.Formatter;
 
-import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -33,8 +32,6 @@ import com.ichi2.libanki.utils.SystemTime;
 import com.ichi2.libanki.utils.Time;
 import com.ichi2.preferences.PreferenceExtensions;
 import com.ichi2.utils.FileUtil;
-
-import net.ankiweb.rsdroid.BackendException;
 
 import java.io.File;
 import java.io.IOException;
@@ -154,9 +151,6 @@ public class CollectionHelper {
     public synchronized Collection getColSafe(Context context) {
         try {
             return getCol(context);
-        } catch (BackendException.BackendDbException.BackendDbLockedException e) {
-            Timber.w(e);
-            return null;
         } catch (Exception e) {
             Timber.w(e);
             AnkiDroidApp.sendExceptionReport(e, "CollectionHelper.getColSafe");
@@ -241,7 +235,6 @@ public class CollectionHelper {
      * @return the folder path
      */
     @SuppressWarnings("deprecation") // TODO Tracked in https://github.com/ankidroid/Anki-Android/issues/5304
-    @CheckResult
     public static String getDefaultAnkiDroidDirectory() {
         return new File(Environment.getExternalStorageDirectory(), "AnkiDroid").getAbsolutePath();
     }
@@ -402,8 +395,4 @@ public class CollectionHelper {
         }
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    public void setColForTests(Collection col) {
-        this.mCollection = col;
-    }
 }

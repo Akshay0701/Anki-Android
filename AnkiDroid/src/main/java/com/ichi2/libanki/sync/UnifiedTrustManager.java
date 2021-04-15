@@ -35,15 +35,15 @@ import timber.log.Timber;
 // Cached the accepted issuers.
 // Did not ignore NoSuchAlgorithmException
 class UnifiedTrustManager implements X509TrustManager {
-    private X509TrustManager mDefaultTrustManager;
-    private X509TrustManager mLocalTrustManager;
+    private X509TrustManager defaultTrustManager;
+    private X509TrustManager localTrustManager;
     private X509Certificate[] mAcceptedIssuers;
 
     public UnifiedTrustManager(KeyStore localKeyStore) throws KeyStoreException, NoSuchAlgorithmException {
-        this.mDefaultTrustManager = createTrustManager(null);
-        this.mLocalTrustManager = createTrustManager(localKeyStore);
-        X509Certificate[] first = mDefaultTrustManager.getAcceptedIssuers();
-        X509Certificate[] second = mLocalTrustManager.getAcceptedIssuers();
+        this.defaultTrustManager = createTrustManager(null);
+        this.localTrustManager = createTrustManager(localKeyStore);
+        X509Certificate[] first = defaultTrustManager.getAcceptedIssuers();
+        X509Certificate[] second = localTrustManager.getAcceptedIssuers();
         mAcceptedIssuers = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, mAcceptedIssuers, first.length, second.length);
     }
@@ -58,19 +58,19 @@ class UnifiedTrustManager implements X509TrustManager {
 
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         try {
-            mLocalTrustManager.checkServerTrusted(chain, authType);
+            localTrustManager.checkServerTrusted(chain, authType);
         } catch (CertificateException ce) {
             Timber.w(ce);
-            mDefaultTrustManager.checkServerTrusted(chain, authType);
+            defaultTrustManager.checkServerTrusted(chain, authType);
         }
     }
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         try {
-            mLocalTrustManager.checkClientTrusted(chain, authType);
+            localTrustManager.checkClientTrusted(chain, authType);
         } catch (CertificateException ce) {
             Timber.w(ce);
-            mDefaultTrustManager.checkClientTrusted(chain, authType);
+            defaultTrustManager.checkClientTrusted(chain, authType);
         }
     }
     @Override

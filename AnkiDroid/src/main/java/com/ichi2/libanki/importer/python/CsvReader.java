@@ -21,8 +21,6 @@
 
 package com.ichi2.libanki.importer.python;
 
-import android.annotation.SuppressLint;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,7 +28,6 @@ import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-@SuppressLint("NonPublicNonStaticFieldName")
 public class CsvReader implements Iterable<List<String>> {
 
     public final CsvDialect dialect;

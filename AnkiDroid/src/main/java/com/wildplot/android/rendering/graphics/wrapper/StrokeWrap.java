@@ -15,9 +15,6 @@
  ****************************************************************************************/
 package com.wildplot.android.rendering.graphics.wrapper;
 
-import android.annotation.SuppressLint;
-
-@SuppressLint("NonPublicNonStaticFieldName")
 public class StrokeWrap {
     private final float strokeSize;
 

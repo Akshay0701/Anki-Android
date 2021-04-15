@@ -52,7 +52,7 @@ import timber.log.Timber;
 public class Tls12SocketFactory extends SSLSocketFactory {
     private static final String[] TLS_V12_ONLY =  {"TLSv1.2"};
 
-    private final SSLSocketFactory mDelegate;
+    private final SSLSocketFactory delegate;
 
 
     public static OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
@@ -101,49 +101,49 @@ public class Tls12SocketFactory extends SSLSocketFactory {
 
 
     private Tls12SocketFactory(SSLSocketFactory base) {
-        this.mDelegate = base;
+        this.delegate = base;
     }
 
 
     @Override
     public String[] getDefaultCipherSuites() {
-        return mDelegate.getDefaultCipherSuites();
+        return delegate.getDefaultCipherSuites();
     }
 
 
     @Override
     public String[] getSupportedCipherSuites() {
-        return mDelegate.getSupportedCipherSuites();
+        return delegate.getSupportedCipherSuites();
     }
 
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        return patch(mDelegate.createSocket(s, host, port, autoClose));
+        return patch(delegate.createSocket(s, host, port, autoClose));
     }
 
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        return patch(mDelegate.createSocket(host, port));
+        return patch(delegate.createSocket(host, port));
     }
 
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return patch(mDelegate.createSocket(host, port, localHost, localPort));
+        return patch(delegate.createSocket(host, port, localHost, localPort));
     }
 
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        return patch(mDelegate.createSocket(host, port));
+        return patch(delegate.createSocket(host, port));
     }
 
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return patch(mDelegate.createSocket(address, port, localAddress, localPort));
+        return patch(delegate.createSocket(address, port, localAddress, localPort));
     }
 
 

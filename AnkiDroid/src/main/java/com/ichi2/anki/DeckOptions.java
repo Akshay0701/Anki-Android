@@ -93,7 +93,7 @@ public class DeckOptions extends AppCompatPreferenceActivity implements OnShared
         private final Map<String, String> mValues = new HashMap<>(30); // At most as many as in cacheValues
         private final Map<String, String> mSummaries = new HashMap<>();
         private MaterialDialog mProgressDialog;
-        private final List<OnSharedPreferenceChangeListener> mListeners = new LinkedList<>();
+        private final List<OnSharedPreferenceChangeListener> listeners = new LinkedList<>();
 
 
         private DeckPreferenceHack() {
@@ -456,7 +456,7 @@ public class DeckOptions extends AppCompatPreferenceActivity implements OnShared
                 updateSummaries();
 
                 // and update any listeners
-                for (OnSharedPreferenceChangeListener listener : mListeners) {
+                for (OnSharedPreferenceChangeListener listener : listeners) {
                     listener.onSharedPreferenceChanged(DeckPreferenceHack.this, null);
                 }
 
@@ -591,13 +591,13 @@ public class DeckOptions extends AppCompatPreferenceActivity implements OnShared
 
         @Override
         public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-            mListeners.add(listener);
+            listeners.add(listener);
         }
 
 
         @Override
         public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-            mListeners.remove(listener);
+            listeners.remove(listener);
         }
 
 
@@ -808,7 +808,7 @@ public class DeckOptions extends AppCompatPreferenceActivity implements OnShared
     protected void buildLists() {
         android.preference.ListPreference deckConfPref = (android.preference.ListPreference) findPreference("deckConf");
         ArrayList<DeckConfig> confs = mCol.getDecks().allConf();
-        Collections.sort(confs, NamedJSONComparator.INSTANCE);
+        Collections.sort(confs, NamedJSONComparator.instance);
         String[] confValues = new String[confs.size()];
         String[] confLabels = new String[confs.size()];
         for (int i = 0; i < confs.size(); i++) {

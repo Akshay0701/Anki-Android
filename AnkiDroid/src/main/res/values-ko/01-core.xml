@@ -111,7 +111,6 @@
     <string name="menu_edit_tags">태그編輯</string>
     <string name="delete_note_message">다음 노트와 그 노트의 모든 카드를 정말로 삭제하시겠습니까?\n%s</string>
     <string name="menu_select">텍스트 선택</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">%1$s에서 찾아보기</string>
     <string name="menu_mark_note">노트 표시</string>
     <string name="menu_unmark_note">노트 표시 해제</string>
@@ -150,7 +149,6 @@
     <string name="custom_study_deck_name">맞춤 학습 세션</string>
     <string name="custom_study_deck_exists">기존의 맞춤 학습 덱의 이름을 먼저 변경하세요.</string>
     <string name="empty_deck">이 카드 묶음은 비어있습니다.</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">카드追加</string>
     <string name="invalid_deck_name">無效한 덱名입니다</string>
     <string name="studyoptions_empty">이 카드 묶음은 비어있습니다. + 버튼을 눌러 새 컨텐츠를 추가하세요.</string>

@@ -169,10 +169,10 @@ public class CollectionTest extends RobolectricTest {
     @Test
     public void test_timestamps() {
         Collection col = getCol();
-        int stdModelSize = StdModels.STD_MODELS.length;
+        int stdModelSize = StdModels.stdModels.length;
         assertEquals(col.getModels().all().size(), stdModelSize);
         for (int i = 0; i < 100; i++) {
-            StdModels.BASIC_MODEL.add(col);
+            StdModels.basicModel.add(col);
         }
         assertEquals(col.getModels().all().size(), 100 + stdModelSize);
     }

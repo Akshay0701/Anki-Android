@@ -103,7 +103,7 @@ public class Connection extends BaseAsyncTask<Connection.Payload, Object, Connec
                 sInstance.get();
             }
         } catch (Exception e) {
-            Timber.w(e);
+            e.printStackTrace();
         }
 
         sInstance = new Connection();
@@ -185,13 +185,13 @@ public class Connection extends BaseAsyncTask<Connection.Payload, Object, Connec
 
 
     public static Connection login(TaskListener listener, Payload data) {
-        data.mTaskType = LOGIN;
+        data.taskType = LOGIN;
         return launchConnectionTask(listener, data);
     }
 
 
     public static Connection sync(TaskListener listener, Payload data) {
-        data.mTaskType = SYNC;
+        data.taskType = SYNC;
         return launchConnectionTask(listener, data);
     }
 
@@ -207,7 +207,7 @@ public class Connection extends BaseAsyncTask<Connection.Payload, Object, Connec
 
 
     private Payload doOneInBackground(Payload data) {
-        switch (data.mTaskType) {
+        switch (data.taskType) {
             case LOGIN:
                 return doInBackgroundLogin(data);
 
@@ -613,7 +613,7 @@ public class Connection extends BaseAsyncTask<Connection.Payload, Object, Connec
     }
 
     public static class Payload {
-        private int mTaskType;
+        private int taskType;
         @NonNull public Object[] data;
         public ConnectionResultType resultType;
         public Object[] result;

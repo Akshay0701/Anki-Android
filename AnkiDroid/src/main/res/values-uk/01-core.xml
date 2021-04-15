@@ -116,7 +116,7 @@
     <string name="menu_bury">Відкласти</string>
     <string name="menu_suspend">Призупинити</string>
     <string name="menu_delete_note">Видалити запис</string>
-    <string name="menu_flag">Прапорець</string>
+    <string name="menu_flag">Позначка</string>
     <string name="menu_flag_card">Позначити картку</string>
     <string name="menu_flag_card_zero">Без позначки</string>
     <string name="menu_flag_card_one">Червоний прапорець</string>
@@ -126,7 +126,6 @@
     <string name="menu_edit_tags">Редагувати примітки</string>
     <string name="delete_note_message">Дійсно видалити цей запис разом з усіма його картками?\n%s</string>
     <string name="menu_select">Виділити текст</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Пошук у %1$s</string>
     <string name="menu_mark_note">Позначити запис</string>
     <string name="menu_unmark_note">Зняти позначку запису</string>
@@ -165,7 +164,6 @@
     <string name="custom_study_deck_name">Додаткове навчання</string>
     <string name="custom_study_deck_exists">Спочатку перейменуйте колоду додаткового навчання</string>
     <string name="empty_deck">Ця колода порожня</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Додати картку</string>
     <string name="invalid_deck_name">Некоректна назва колоди</string>
     <string name="studyoptions_empty">Ця колода порожня. Натисніть на кнопку +, щоб додати новий вміст.</string>

@@ -31,36 +31,36 @@ public class CountingFileRequestBody extends RequestBody {
 
     private static final int SEGMENT_SIZE = 8092; // okio.Segment.SIZE (internal, copy required)
 
-    private final File mFile;
-    private final ProgressListener mListener;
-    private final String mContentType;
+    private final File file;
+    private final ProgressListener listener;
+    private final String contentType;
 
     public CountingFileRequestBody(File file, String contentType, ProgressListener listener) {
-        this.mFile = file;
-        this.mContentType = contentType;
-        this.mListener = listener;
+        this.file = file;
+        this.contentType = contentType;
+        this.listener = listener;
     }
 
     @Override
     public long contentLength() {
-        return mFile.length();
+        return file.length();
     }
 
     @Override
     public MediaType contentType() {
-        return MediaType.parse(mContentType);
+        return MediaType.parse(contentType);
     }
 
     @Override
     public void writeTo(BufferedSink sink) throws IOException {
         Source source = null;
         try {
-            source = Okio.source(mFile);
+            source = Okio.source(file);
             long read;
 
             while ((read = source.read(sink.getBuffer(), SEGMENT_SIZE)) != -1) {
                 sink.flush();
-                this.mListener.transferred(read);
+                this.listener.transferred(read);
             }
         } finally {
             Util.closeQuietly(source);

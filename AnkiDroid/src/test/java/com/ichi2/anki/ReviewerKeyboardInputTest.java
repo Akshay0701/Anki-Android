@@ -19,7 +19,6 @@ package com.ichi2.anki;
 import android.view.KeyEvent;
 
 import com.ichi2.anki.reviewer.ReviewerUi;
-import com.ichi2.async.CollectionTask;
 import com.ichi2.libanki.Card;
 import com.ichi2.libanki.Collection;
 
@@ -272,7 +271,7 @@ public class ReviewerKeyboardInputTest extends RobolectricTest {
         private int mAnswerButtonCount = 4;
         private boolean mEditedCard;
         private boolean mMarkedCard;
-        private CollectionTask.DismissNote mDismissType;
+        private Collection.DismissType mDismissType;
         private boolean mUndoCalled;
         private boolean mReplayAudioCalled;
         private ControlBlock mControlsAreBlocked = ControlBlock.UNBLOCKED;
@@ -455,12 +454,12 @@ public class ReviewerKeyboardInputTest extends RobolectricTest {
         }
 
         public boolean getSuspendNoteCalled() {
-            return mDismissType instanceof CollectionTask.SuspendNote;
+            return mDismissType == Collection.DismissType.SUSPEND_NOTE;
         }
 
 
         public boolean getBuryNoteCalled() {
-            return mDismissType instanceof CollectionTask.BuryNote;
+            return mDismissType == Collection.DismissType.BURY_NOTE;
         }
 
 
@@ -474,8 +473,8 @@ public class ReviewerKeyboardInputTest extends RobolectricTest {
         }
 
         @Override
-        protected void dismiss(CollectionTask.DismissNote dismiss) {
-            this.mDismissType = dismiss;
+        protected void dismiss(Collection.DismissType type) {
+            this.mDismissType = type;
         }
 
         @Override
@@ -490,7 +489,7 @@ public class ReviewerKeyboardInputTest extends RobolectricTest {
 
 
         public boolean getSuspendCardCalled() {
-            return mDismissType instanceof CollectionTask.SuspendCard;
+            return mDismissType == Collection.DismissType.SUSPEND_CARD;
         }
 
 

@@ -31,9 +31,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.ichi2.anki.R;
-import com.ichi2.anki.UIUtils;
 import com.ichi2.anki.multimediacard.beolingus.parsing.BeolingusParser;
 import com.ichi2.anki.multimediacard.language.LanguageListerBeolingus;
 import com.ichi2.anki.runtimetools.TaskOperations;
@@ -68,7 +68,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
     private String mTranslationAddress;
 
     @SuppressWarnings("deprecation") // tracked in github as #5020
-    private android.app.ProgressDialog mProgressDialog = null;
+    private android.app.ProgressDialog progressDialog = null;
 
     private String mPronunciationAddress;
 
@@ -158,7 +158,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
             mPostTranslation.execute();
         } catch (Exception e) {
             Timber.w(e);
-            mProgressDialog.dismiss();
+            progressDialog.dismiss();
             showToast(gtxt(R.string.multimedia_editor_something_wrong));
         }
     }
@@ -169,10 +169,10 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
 
         dismissCarefullyProgressDialog();
 
-        mProgressDialog = android.app.ProgressDialog.show(this, gtxt(R.string.multimedia_editor_progress_wait_title), message, true,
+        progressDialog = android.app.ProgressDialog.show(this, gtxt(R.string.multimedia_editor_progress_wait_title), message, true,
                 false);
-        mProgressDialog.setCancelable(true);
-        mProgressDialog.setOnCancelListener(this);
+        progressDialog.setCancelable(true);
+        progressDialog.setOnCancelListener(this);
     }
 
     /**
@@ -291,7 +291,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
                 mPostPronunciation.execute();
             } catch (Exception e) {
                 Timber.w(e);
-                mProgressDialog.dismiss();
+                progressDialog.dismiss();
                 showToast(gtxt(R.string.multimedia_editor_something_wrong));
             }
 
@@ -320,7 +320,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
                 mDownloadMp3Task.execute();
             } catch (Exception e) {
                 Timber.w(e);
-                mProgressDialog.dismiss();
+                progressDialog.dismiss();
                 showToast(gtxt(R.string.multimedia_editor_something_wrong));
             }
         }
@@ -343,7 +343,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
             return;
         }
 
-        mProgressDialog.dismiss();
+        progressDialog.dismiss();
         showToast(gtxt(R.string.multimedia_editor_general_done));
         Intent resultData = new Intent();
         resultData.putExtra(EXTRA_PRONUNCIATION_FILE_PATH, result);
@@ -367,7 +367,7 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
 
 
     private void stop(String string) {
-        mProgressDialog.dismiss();
+        progressDialog.dismiss();
         showToast(string);
     }
 
@@ -402,12 +402,16 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
 
 
     private void showToast(CharSequence text) {
-        UIUtils.showThemedToast(this, text, true);
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(this, text, duration);
+        toast.show();
     }
 
 
     private void showToastLong(CharSequence text) {
-        UIUtils.showThemedToast(this, text, false);
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(this, text, duration);
+        toast.show();
     }
 
 
@@ -425,8 +429,8 @@ public class LoadPronounciationActivity extends Activity implements OnCancelList
 
     private void dismissCarefullyProgressDialog() {
         try {
-            if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
+            if ((progressDialog != null) && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
             }
         } catch (Exception e) {
             Timber.w(e);

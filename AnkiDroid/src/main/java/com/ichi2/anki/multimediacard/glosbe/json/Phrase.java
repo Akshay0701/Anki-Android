@@ -23,26 +23,26 @@ package com.ichi2.anki.multimediacard.glosbe.json;
  * This is one of the classes, automatically generated to transform json replies from glosbe.com
  */
 public class Phrase {
-    private String mLanguage;
-    private String mText;
+    private String language;
+    private String text;
 
 
     public String getLanguage() {
-        return this.mLanguage;
+        return this.language;
     }
 
 
     public void setLanguage(String l) {
-        this.mLanguage = l;
+        this.language = l;
     }
 
 
     public String getText() {
-        return this.mText;
+        return this.text;
     }
 
 
     public void setText(String text) {
-        this.mText = text;
+        this.text = text;
     }
 }

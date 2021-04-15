@@ -53,6 +53,8 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
     protected CharSequence mTitle;
     protected Boolean mFragmented = false;
     private boolean mNavButtonGoesBack = false;
+    // Other members
+    private String mOldColPath;
     private int mOldTheme;
     // Navigation drawer list item entries
     private DrawerLayout mDrawerLayout;
@@ -68,7 +70,7 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
     /**
      * runnable that will be executed after the drawer has been closed.
      */
-    private Runnable mPendingRunnable;
+    private Runnable pendingRunnable;
 
     // Navigation drawer initialisation
     protected void initNavigationDrawer(View mainView) {
@@ -109,9 +111,9 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
                 // If animations are disabled, this is executed before onNavigationItemSelected is called
                 // PERF: May be able to reduce this delay
                 new Handler().postDelayed(() -> {
-                    if (mPendingRunnable != null) {
-                        new Handler().post(mPendingRunnable);
-                        mPendingRunnable = null;
+                    if (pendingRunnable != null) {
+                        new Handler().post(pendingRunnable);
+                        pendingRunnable = null;
                     }
                 }, 100);
 
@@ -235,16 +237,22 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
         NotificationChannels.setup(getApplicationContext());
         // Restart the activity on preference change
         if (requestCode == REQUEST_PREFERENCES_UPDATE) {
-            // collection path hasn't been changed so just restart the current activity
-            if ((this instanceof Reviewer) && preferences.getBoolean("tts", false)) {
-                // Workaround to kick user back to StudyOptions after opening settings from Reviewer
-                // because onDestroy() of old Activity interferes with TTS in new Activity
-                finishWithoutAnimation();
-            } else if (mOldTheme != Themes.getCurrentTheme(getApplicationContext())) {
-                // The current theme was changed, so need to reload the stack with the new theme
-                restartActivityInvalidateBackstack(this);
+            if (mOldColPath != null && CollectionHelper.getCurrentAnkiDroidDirectory(this).equals(mOldColPath)) {
+                // collection path hasn't been changed so just restart the current activity
+                if ((this instanceof Reviewer) && preferences.getBoolean("tts", false)) {
+                    // Workaround to kick user back to StudyOptions after opening settings from Reviewer
+                    // because onDestroy() of old Activity interferes with TTS in new Activity
+                    finishWithoutAnimation();
+                } else if (mOldTheme != Themes.getCurrentTheme(getApplicationContext())) {
+                    // The current theme was changed, so need to reload the stack with the new theme
+                    restartActivityInvalidateBackstack(this);
+                } else {
+                    restartActivity();
+                }
             } else {
-                restartActivity();
+                // collection path has changed so kick the user back to the DeckPicker
+                CollectionHelper.getInstance().closeCollection(true, "Preference Modification: collection path changed");
+                restartActivityInvalidateBackstack(this);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -268,7 +276,7 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
      */
     protected void onNavigationPressed() {
         if (mNavButtonGoesBack) {
-            finishWithAnimation(END);
+            finishWithAnimation(RIGHT);
         } else {
             openDrawer();
         }
@@ -285,35 +293,33 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
          * This runnable will be executed in onDrawerClosed(...)
          * to make the animation more fluid on older devices.
          */
-        mPendingRunnable = () -> {
+        pendingRunnable = () -> {
             // Take action if a different item selected
             int itemId = item.getItemId();
             if (itemId == R.id.nav_decks) {
                 Timber.i("Navigating to decks");
                 Intent deckPicker = new Intent(NavigationDrawerActivity.this, DeckPicker.class);
                 deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);    // opening DeckPicker should clear back history
-                startActivityWithAnimation(deckPicker, END);
+                startActivityWithAnimation(deckPicker, RIGHT);
             } else if (itemId == R.id.nav_browser) {
                 Timber.i("Navigating to card browser");
                 openCardBrowser();
             } else if (itemId == R.id.nav_stats) {
                 Timber.i("Navigating to stats");
                 Intent intent = new Intent(NavigationDrawerActivity.this, Statistics.class);
-                startActivityForResultWithAnimation(intent, REQUEST_STATISTICS, START);
+                startActivityForResultWithAnimation(intent, REQUEST_STATISTICS, LEFT);
             } else if (itemId == R.id.nav_night_mode) {
                 Timber.i("Toggling Night Mode");
                 mNightModeSwitch.performClick();
             } else if (itemId == R.id.nav_settings) {
                 Timber.i("Navigating to settings");
+                mOldColPath = CollectionHelper.getCurrentAnkiDroidDirectory(NavigationDrawerActivity.this);
                 // Remember the theme we started with so we can restart the Activity if it changes
                 mOldTheme = Themes.getCurrentTheme(getApplicationContext());
                 startActivityForResultWithAnimation(new Intent(NavigationDrawerActivity.this, Preferences.class), REQUEST_PREFERENCES_UPDATE, FADE);
             } else if (itemId == R.id.nav_help) {
                 Timber.i("Navigating to help");
                 showDialogFragment(HelpDialog.createInstance(this));
-            } else if (itemId == R.id.support_ankidroid) {
-                Timber.i("Navigating to support AnkiDroid");
-                showDialogFragment(HelpDialog.createInstanceForSupportAnkiDroid(this));
             }
         };
 
@@ -327,7 +333,7 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
         if (currentCardId != null) {
             intent.putExtra("currentCard", currentCardId);
         }
-        startActivityForResultWithAnimation(intent, REQUEST_BROWSE_CARDS, START);
+        startActivityForResultWithAnimation(intent, REQUEST_BROWSE_CARDS, LEFT);
     }
 
     // Override this to specify a specific card id

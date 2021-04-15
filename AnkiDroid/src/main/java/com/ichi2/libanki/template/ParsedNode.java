@@ -1,6 +1,7 @@
 package com.ichi2.libanki.template;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Pair;
 
 import com.ichi2.anki.R;
@@ -8,6 +9,7 @@ import com.ichi2.libanki.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.WeakHashMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import okhttp3.internal.Util;
 import timber.log.Timber;
 
 /**
@@ -95,11 +98,11 @@ public abstract class ParsedNode {
         while (tokens.hasNext()) {
             Tokenizer.Token token = tokens.next();
             switch (token.getKind()) {
-                case TEXT: {
+                case Text: {
                     nodes.add(new Text(token.getText()));
                     break;
                 }
-                case REPLACEMENT: {
+                case Replacement: {
                     String[] it = token.getText().split(":", -1);
                     String key = it[it.length - 1];
                     List<String> filters = new ArrayList<>(it.length - 1);
@@ -109,17 +112,17 @@ public abstract class ParsedNode {
                     nodes.add(new Replacement(key, filters, token.getText()));
                     break;
                 }
-                case OPEN_CONDITIONAL: {
+                case OpenConditional: {
                     String tag = token.getText();
                     nodes.add(new Conditional(tag, parse_inner(tokens, tag)));
                     break;
                 }
-                case OPEN_NEGATED: {
+                case OpenNegated: {
                     String tag = token.getText();
                     nodes.add(new NegatedConditional(tag, parse_inner(tokens, tag)));
                     break;
                 }
-                case CLOSE_CONDITIONAL: {
+                case CloseConditional: {
                     String tag = token.getText();
                     if (open_tag == null) {
                         throw new TemplateError.ConditionalNotOpen(tag);

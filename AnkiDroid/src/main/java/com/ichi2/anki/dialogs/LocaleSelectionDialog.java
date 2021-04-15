@@ -40,7 +40,6 @@ import com.ichi2.ui.RecyclerSingleTouchAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,11 +49,12 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import java8.util.Lists;
 
 /** Locale selection dialog. Note: this must be dismissed onDestroy if not called from an activity implementing LocaleSelectionDialogHandler */
 public class LocaleSelectionDialog extends AnalyticsDialogFragment {
 
-    private LocaleSelectionDialogHandler mDialogHandler;
+    private LocaleSelectionDialogHandler dialogHandler;
 
     public interface LocaleSelectionDialogHandler {
         void onSelectedLocale(@NonNull Locale selectedLocale);
@@ -70,7 +70,7 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
     @NonNull
     public static LocaleSelectionDialog newInstance(@NonNull LocaleSelectionDialogHandler handler) {
         LocaleSelectionDialog t = new LocaleSelectionDialog();
-        t.mDialogHandler = handler;
+        t.dialogHandler = handler;
         Bundle args = new Bundle();
         t.setArguments(args);
 
@@ -90,11 +90,11 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
         super.onAttach(context);
         if (context instanceof Activity) {
             Activity activity = (Activity) context;
-            if (mDialogHandler == null) {
+            if (dialogHandler == null) {
                 if (!(context instanceof LocaleSelectionDialogHandler)) {
                     throw new IllegalArgumentException("Calling activity must implement LocaleSelectionDialogHandler");
                 }
-                this.mDialogHandler = (LocaleSelectionDialogHandler) context;
+                this.dialogHandler = (LocaleSelectionDialogHandler) context;
             }
             activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
@@ -118,7 +118,7 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(activity)
                 .negativeText(getString(R.string.dialog_cancel))
                 .customView(tagsDialogView, false)
-                .onNegative((dialog, which) -> mDialogHandler.onLocaleSelectionCancelled());
+                .onNegative((dialog, which) -> dialogHandler.onLocaleSelectionCancelled());
 
         Dialog mDialog = builder.build();
 
@@ -133,6 +133,7 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
     private void setupRecyclerView(@NonNull Activity activity, @NonNull View tagsDialogView, LocaleListAdapter adapter) {
         RecyclerView recyclerView = tagsDialogView.findViewById(R.id.locale_dialog_selection_list);
         recyclerView.requestFocus();
+        recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -140,7 +141,7 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
 
         recyclerView.addOnItemTouchListener(new RecyclerSingleTouchAdapter(activity, (view, position) -> {
             Locale l = adapter.getLocaleAtPosition(position);
-            LocaleSelectionDialog.this.mDialogHandler.onSelectedLocale(l);
+            LocaleSelectionDialog.this.dialogHandler.onSelectedLocale(l);
         }));
     }
 
@@ -197,7 +198,7 @@ public class LocaleSelectionDialog extends AnalyticsDialogFragment {
         }
 
         public LocaleListAdapter(@NonNull Locale[] locales) {
-            mSelectableLocales = Collections.unmodifiableList(new ArrayList<>(Arrays.asList(locales)));
+            mSelectableLocales = Lists.of(locales);
             mCurrentlyVisibleLocales = new ArrayList<>(Arrays.asList(locales));
         }
 

@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Dizze memo en al syn kaarten fuortsmite?\n%s</string>
     <string name="menu_select">Tekst selektearje</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Opsykje yn %1$s</string>
     <string name="menu_mark_note">Mark note</string>
     <string name="menu_unmark_note">Unmark note</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">Oanpaste stúdzjesessy</string>
     <string name="custom_study_deck_exists">Hernoem de besteande stúdzjeset earst</string>
     <string name="empty_deck">This deck is empty</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">This deck is empty. Press the + button to add new content.</string>

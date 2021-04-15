@@ -15,17 +15,8 @@
  ****************************************************************************************/
 package com.wildplot.android.parsing;
 
-import android.annotation.SuppressLint;
+import com.wildplot.android.parsing.AtomTypes.*;
 
-import com.wildplot.android.parsing.AtomTypes.FunctionXAtom;
-import com.wildplot.android.parsing.AtomTypes.FunctionXYAtom;
-import com.wildplot.android.parsing.AtomTypes.MathFunctionAtom;
-import com.wildplot.android.parsing.AtomTypes.NumberAtom;
-import com.wildplot.android.parsing.AtomTypes.VariableAtom;
-import com.wildplot.android.parsing.AtomTypes.XVariableAtom;
-import com.wildplot.android.parsing.AtomTypes.YVariableAtom;
-
-@SuppressLint("NonPublicNonStaticFieldName")
 public class Atom implements TreeElement {
     private final TopLevelParser parser;
 

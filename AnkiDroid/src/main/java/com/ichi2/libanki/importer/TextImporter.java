@@ -35,12 +35,12 @@ public class TextImporter extends NoteImporter {
     private boolean mNeedDelimiter = true;
     final String mPatterns = "\t|,;:";
 
-    private FileObj mFileobj;
-    private char mDelimiter;
-    private String[] mTagstoadd;
+    private FileObj fileobj;
+    private char delimiter;
+    private String[] tagsToAdd;
 
-    private CsvDialect mDialect;
-    private int mNumFields;
+    private CsvDialect dialect;
+    private int numFields;
 
 
     private boolean mFirstLineWasTags;
@@ -48,9 +48,9 @@ public class TextImporter extends NoteImporter {
 
     public TextImporter(Collection col, String file) {
         super(col, file);
-        mFileobj = null;
-        mDelimiter = '\0';
-        mTagstoadd = new String[0];
+        fileobj = null;
+        delimiter = '\0';
+        tagsToAdd = new String[0];
     }
 
 
@@ -66,10 +66,10 @@ public class TextImporter extends NoteImporter {
         // Note: This differs from libAnki as we don't have csv.reader
         Iterator<String> data = getDataStream().iterator();
         CsvReader reader;
-        if (mDelimiter != '\0') {
-            reader = CsvReader.fromDelimiter(data, mDelimiter);
+        if (delimiter != '\0') {
+            reader = CsvReader.fromDelimiter(data, delimiter);
         } else {
-            reader = CsvReader.fromDialect(data, mDialect);
+            reader = CsvReader.fromDialect(data, dialect);
         }
         try {
             for (List<String> row : reader) {
@@ -77,12 +77,12 @@ public class TextImporter extends NoteImporter {
                     continue;
                 }
                 List<String> rowAsString = new ArrayList<>(row);
-                if (rowAsString.size() != mNumFields) {
+                if (rowAsString.size() != numFields) {
                     if (rowAsString.size() > 0) {
                         String formatted = getString(R.string.csv_importer_error_invalid_field_count,
                                 TextUtils.join(" ", rowAsString),
                                 rowAsString.size(),
-                                mNumFields);
+                                numFields);
                         log.add(formatted);
                         ignored += 1;
 
@@ -96,7 +96,7 @@ public class TextImporter extends NoteImporter {
             log.add(getString(R.string.csv_importer_error_exception, e));
         }
         mLog = log;
-        mFileobj.close();
+        fileobj.close();
         return notes;
     }
 
@@ -104,14 +104,14 @@ public class TextImporter extends NoteImporter {
     @Override
     protected int fields() {
         open();
-        return mNumFields;
+        return numFields;
     }
 
 
     private ForeignNote noteFromFields(List<String> fields) {
         ForeignNote note = new ForeignNote();
         note.mFields.addAll(fields);
-        note.mTags.addAll(Arrays.asList(mTagstoadd));
+        note.mTags.addAll(Arrays.asList(tagsToAdd));
         return note;
     }
 
@@ -125,27 +125,27 @@ public class TextImporter extends NoteImporter {
 
     /** Read file into self.lines if not already there. */
     private void cacheFile() {
-        if (mFileobj == null) {
+        if (fileobj == null) {
             openFile();
         }
     }
 
 
     private void openFile() {
-        mDialect = null;
-        mFileobj = FileObj.open(mFile);
+        dialect = null;
+        fileobj = FileObj.open(mFile);
 
         String firstLine = getFirstFileLine().orElse(null);
         if (firstLine != null) {
             if (firstLine.startsWith("tags:")) {
                 String tags = firstLine.substring("tags:".length()).trim();
-                mTagstoadd = tags.split(" ");
+                tagsToAdd = tags.split(" ");
                 this.mFirstLineWasTags = true;
             }
             updateDelimiter();
         }
 
-        if (mDialect == null && mDelimiter == '\0') {
+        if (dialect == null && delimiter == '\0') {
             throw new RuntimeException("unknownFormat");
         }
     }
@@ -156,16 +156,16 @@ public class TextImporter extends NoteImporter {
     }
 
     private void updateDelimiter() {
-        mDialect = null;
+        dialect = null;
         CsvSniffer sniffer = new CsvSniffer();
-        if (mDelimiter == '\0') {
+        if (delimiter == '\0') {
             try {
                 String join = getLinesFromFile(10);
-                mDialect = sniffer.sniff(join, mPatterns.toCharArray());
+                dialect = sniffer.sniff(join, mPatterns.toCharArray());
             } catch (Exception e) {
                 Timber.w(e);
                 try {
-                    mDialect = sniffer.sniff(getFirstFileLine().orElse(""), mPatterns.toCharArray());
+                    dialect = sniffer.sniff(getFirstFileLine().orElse(""), mPatterns.toCharArray());
                 } catch (Exception ex) {
                     Timber.w(ex);
                     // pass
@@ -176,9 +176,9 @@ public class TextImporter extends NoteImporter {
         Iterator<String> data = getDataStream().iterator();
 
         CsvReader reader = null;
-        if (mDialect != null) {
+        if (dialect != null) {
             try {
-                reader = CsvReader.fromDialect(data, mDialect);
+                reader = CsvReader.fromDialect(data, dialect);
             } catch (Exception e) {
                 Timber.w(e);
                 err();
@@ -186,25 +186,25 @@ public class TextImporter extends NoteImporter {
         } else {
             // PERF: This starts the file read twice - whereas we only need the first line
             String firstLine = getFirstFileLine().orElse("");
-            if (mDelimiter == '\0') {
+            if (delimiter == '\0') {
                 if (firstLine.contains("\t")) {
-                    mDelimiter = '\t';
+                    delimiter = '\t';
                 } else if(firstLine.contains(";")) {
-                    mDelimiter = ';';
+                    delimiter = ';';
                 } else if(firstLine.contains(",")) {
-                    mDelimiter = ',';
+                    delimiter = ',';
                 } else {
-                    mDelimiter = ' ';
+                    delimiter = ' ';
                 }
             }
-            reader = CsvReader.fromDelimiter(data, mDelimiter);
+            reader = CsvReader.fromDelimiter(data, delimiter);
         }
 
         try {
             while (true) {
                 List<String> row = reader.next();
                 if (row.size() > 0) {
-                    mNumFields = row.size();
+                    numFields = row.size();
                     break;
                 }
             }
@@ -234,7 +234,7 @@ public class TextImporter extends NoteImporter {
     private Stream<String> getDataStream() {
         Stream<String> data;
         try {
-            data = mFileobj.readAsUtf8WithoutBOM();
+            data = fileobj.readAsUtf8WithoutBOM();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

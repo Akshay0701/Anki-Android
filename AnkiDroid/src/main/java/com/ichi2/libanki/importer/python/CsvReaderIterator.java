@@ -21,8 +21,6 @@
 
 package com.ichi2.libanki.importer.python;
 
-import android.annotation.SuppressLint;
-
 import com.ichi2.libanki.importer.CsvException;
 
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import timber.log.Timber;
 import static com.ichi2.libanki.importer.python.CsvDialect.Quoting.*;
 import static com.ichi2.libanki.importer.python.CsvReaderIterator.State.*;
 
-@SuppressLint("NonPublicNonStaticFieldName")
 public class CsvReaderIterator implements Iterator<List<String>> {
     private final CsvReader reader;
 

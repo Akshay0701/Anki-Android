@@ -15,8 +15,6 @@
  ****************************************************************************************/
 package com.wildplot.android.rendering;
 
-import android.annotation.SuppressLint;
-
 import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
 import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
 import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
@@ -27,7 +25,6 @@ import com.wildplot.android.rendering.interfaces.Legendable;
 /**
  * BarGraph uses a point matrix or a function to render bar graphs on PlotSheet object
  */
-@SuppressLint("NonPublicNonStaticFieldName")
 public class BarGraph implements Drawable, Legendable {
 
     private String mName = "";

@@ -25,48 +25,48 @@ import java.util.List;
  * This is one of the classes, automatically generated to transform json replies from glosbe.com
  */
 public class Tuc {
-    private List<Number> mAuthors;
-    private Number mMeaningId;
-    private List<Meaning> mMeanings;
-    private Phrase mPhrase;
+    private List<Number> authors;
+    private Number meaningId;
+    private List<Meaning> meanings;
+    private Phrase phrase;
 
 
     public List<Number> getAuthors() {
-        return this.mAuthors;
+        return this.authors;
     }
 
 
     public void setAuthors(List<Number> authors) {
-        this.mAuthors = authors;
+        this.authors = authors;
     }
 
 
     public Number getMeaningId() {
-        return this.mMeaningId;
+        return this.meaningId;
     }
 
 
     public void setMeaningId(Number meaningId) {
-        this.mMeaningId = meaningId;
+        this.meaningId = meaningId;
     }
 
 
     public List<Meaning> getMeanings() {
-        return this.mMeanings;
+        return this.meanings;
     }
 
 
     public void setMeanings(List<Meaning> meanings) {
-        this.mMeanings = meanings;
+        this.meanings = meanings;
     }
 
 
     public Phrase getPhrase() {
-        return this.mPhrase;
+        return this.phrase;
     }
 
 
     public void setPhrase(Phrase phrase) {
-        this.mPhrase = phrase;
+        this.phrase = phrase;
     }
 }

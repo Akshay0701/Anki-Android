@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Επεξεργασία ετικετών</string>
     <string name="delete_note_message">Πραγματικά να διαγραφεί αυτή η σημείωση και όλες οι κάρτες της;\n%s</string>
     <string name="menu_select">Επιλογή κειμένου</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Αναζήτηση στο %1$s</string>
     <string name="menu_mark_note">Μαρκάρισμα σημείωσης</string>
     <string name="menu_unmark_note">Ξεμαρκάρισμα σημείωσης</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">Προσαρμοσμένη μελέτη λειτουργίας</string>
     <string name="custom_study_deck_exists">Παρακαλούμε μετονομάστε την υπάρχουσα τράπουλα Προσαρμοσμένης Μελέτης πρώτα.</string>
     <string name="empty_deck">Αυτή η τράπουλα είναι κενή</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">Αυτή η τράπουλα είναι κενή. Πατήστε το κουμπί + για να προσθέσετε πριεχόμενο.</string>

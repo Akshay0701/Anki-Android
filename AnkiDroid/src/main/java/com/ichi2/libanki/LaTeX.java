@@ -18,7 +18,10 @@
 
 package com.ichi2.libanki;
 
+import android.text.Html;
+
 import com.ichi2.utils.HtmlUtils;
+import com.ichi2.utils.JSONObject;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,11 +47,11 @@ public class LaTeX {
     /**
      * Patterns used to identify LaTeX tags
      */
-    public static final Pattern STANDARD_PATTERN = Pattern.compile("\\[latex](.+?)\\[/latex]",
+    public static final Pattern sStandardPattern = Pattern.compile("\\[latex](.+?)\\[/latex]",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-    public static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\[\\$](.+?)\\[/\\$]",
+    public static final Pattern sExpressionPattern = Pattern.compile("\\[\\$](.+?)\\[/\\$]",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-    public static final Pattern MATH_PATTERN = Pattern.compile("\\[\\$\\$](.+?)\\[/\\$\\$]",
+    public static final Pattern sMathPattern = Pattern.compile("\\[\\$\\$](.+?)\\[/\\$\\$]",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
 
@@ -64,20 +67,20 @@ public class LaTeX {
     @VisibleForTesting
     public static String mungeQA(String html, Media m, Model model) {
         StringBuffer sb = new StringBuffer();
-        Matcher matcher = STANDARD_PATTERN.matcher(html);
+        Matcher matcher = sStandardPattern.matcher(html);
         while (matcher.find()) {
             matcher.appendReplacement(sb, _imgLink(matcher.group(1), model, m));
         }
         matcher.appendTail(sb);
 
-        matcher = EXPRESSION_PATTERN.matcher(sb.toString());
+        matcher = sExpressionPattern.matcher(sb.toString());
         sb = new StringBuffer();
         while (matcher.find()) {
             matcher.appendReplacement(sb, _imgLink("$" + matcher.group(1) + "$", model, m));
         }
         matcher.appendTail(sb);
 
-        matcher = MATH_PATTERN.matcher(sb.toString());
+        matcher = sMathPattern.matcher(sb.toString());
         sb = new StringBuffer();
         while (matcher.find()) {
             matcher.appendReplacement(sb,

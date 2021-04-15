@@ -42,8 +42,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-
-import com.ichi2.utils.AndroidUiUtils;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -138,10 +137,16 @@ public class FixedEditText extends AppCompatEditText {
         }
     }
 
+
     /**
      * Focuses the edit text and opens the soft keyboard.
      */
     public void focusWithKeyboard() {
-        AndroidUiUtils.setFocusAndOpenKeyboard(this);
+        //  Required on some Android 9,10 devices to show keyboard: https://stackoverflow.com/a/7784904
+        this.postDelayed(() -> {
+            this.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
+        }, 200);
     }
 }

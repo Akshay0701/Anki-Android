@@ -15,7 +15,6 @@
  ****************************************************************************************/
 package com.wildplot.android.rendering.graphics.wrapper;
 
-import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -27,7 +26,6 @@ import android.graphics.Typeface;
  *
  * @author Michael Goldbach
  */
-@SuppressLint("NonPublicNonStaticFieldName")
 public class GraphicsWrap {
     private final Canvas canvas;
     private final Paint paint;

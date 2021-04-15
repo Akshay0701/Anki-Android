@@ -64,7 +64,7 @@ public class NoteImporter extends Importer {
 
     /** _nextID in python */
     private long mNextId;
-    private ArrayList<Long> mIds;
+    private ArrayList<Long> _ids;
     private boolean mEmptyNotes;
     private int mUpdateCount;
     private List<ParsedNode> mTemplateParsed;
@@ -169,7 +169,7 @@ public class NoteImporter extends Importer {
         List<String> updateLog = new ArrayList<>(notes.size());
         // PORT: Translations moved closer to their sources
         List<Object[]> _new = new ArrayList<>();
-        mIds = new ArrayList<>();
+        _ids = new ArrayList<>();
         mEmptyNotes = false;
         int dupeCount = 0;
         List<String> dupes = new ArrayList<>(notes.size());
@@ -243,9 +243,9 @@ public class NoteImporter extends Importer {
         addNew(_new);
         addUpdates(updates);
         // make sure to update sflds, etc
-        mCol.updateFieldCache(mIds);
+        mCol.updateFieldCache(_ids);
         // generate cards
-        if (!mCol.genCards(mIds, mModel).isEmpty()) {
+        if (!mCol.genCards(_ids, mModel).isEmpty()) {
             this.getLog().add(0, getString(R.string.note_importer_empty_cards_found));
         }
 
@@ -274,14 +274,14 @@ public class NoteImporter extends Importer {
         if (mEmptyNotes) {
             mLog.add(getString(R.string.note_importer_error_empty_notes));
         }
-        mTotal = mIds.size();
+        mTotal = _ids.size();
     }
 
     @Nullable
     private Object[] newData(ForeignNote n) {
         long id = mNextId;
         mNextId++;
-        mIds.add(id);
+        _ids.add(id);
         if (!processFields(n)) {
             return null;
         }
@@ -306,7 +306,7 @@ public class NoteImporter extends Importer {
 
 
     private Object[] updateData(ForeignNote n, long id, String[] sflds) {
-        mIds.add(id);
+        _ids.add(id);
         if (!processFields(n, sflds)) {
             return null;
         }

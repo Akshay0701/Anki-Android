@@ -6,8 +6,8 @@ package com.ichi2.utils;
 public interface BooleanGetter {
     boolean getBoolean();
 
-    BooleanGetter TRUE = () -> true;
-    BooleanGetter FALSE = () -> false;
+    BooleanGetter True = () -> true;
+    BooleanGetter False = () -> false;
     static BooleanGetter fromBoolean(boolean b) {
         return (() -> b);
     }

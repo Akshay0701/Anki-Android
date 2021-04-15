@@ -35,13 +35,12 @@ import android.widget.Button;
 
 import com.ichi2.utils.IntentUtil;
 import com.ichi2.utils.VersionUtils;
-import com.ichi2.utils.ViewGroupUtils;
 
 import org.acra.util.Installation;
 
 import timber.log.Timber;
 
-import static com.ichi2.anim.ActivityTransitionAnimation.Direction.START;
+import static com.ichi2.anim.ActivityTransitionAnimation.Direction.LEFT;
 
 /**
  * Shows an about box, which is a small HTML page.
@@ -104,8 +103,6 @@ public class Info extends AnkiActivity {
         int backgroundColor = typedArray.getColor(0, -1);
         String textColor = String.format("#%06X", (0xFFFFFF & typedArray.getColor(1, -1))); // Color to hex string
         webView.setBackgroundColor(backgroundColor);
-
-        ViewGroupUtils.setRenderWorkaround(this);
 
         switch (mType) {
             case TYPE_ABOUT: {
@@ -198,7 +195,7 @@ public class Info extends AnkiActivity {
 
 
     private void finishWithAnimation() {
-        finishWithAnimation(START);
+        finishWithAnimation(LEFT);
     }
 
 

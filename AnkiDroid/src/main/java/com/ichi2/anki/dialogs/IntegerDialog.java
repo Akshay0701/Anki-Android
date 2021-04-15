@@ -14,10 +14,10 @@ import androidx.annotation.Nullable;
 
 public class IntegerDialog extends AnalyticsDialogFragment {
 
-    private Consumer<Integer> mConsumer;
+    private Consumer<Integer> consumer;
 
     public void setCallbackRunnable(Consumer<Integer> consumer) {
-        this.mConsumer = consumer;
+        this.consumer = consumer;
     }
 
     public void setArgs(String title, String prompt, int digits) {
@@ -43,7 +43,7 @@ public class IntegerDialog extends AnalyticsDialogFragment {
                 .inputType(InputType.TYPE_CLASS_NUMBER)
                 .inputRange(1, getArguments().getInt("digits"))
                 .input(getArguments().getString("prompt"), "",
-                        (dialog, text) -> mConsumer.consume(Integer.parseInt(text.toString())));
+                        (dialog, text) -> consumer.consume(Integer.parseInt(text.toString())));
         //builder.content's argument is marked as @NotNull
         //We can't use "" as that creates padding, and want to respect the contract, so only set if not null
         String content = getArguments().getString("content");

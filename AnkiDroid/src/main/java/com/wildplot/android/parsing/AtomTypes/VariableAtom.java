@@ -15,8 +15,6 @@
  ****************************************************************************************/
 package com.wildplot.android.parsing.AtomTypes;
 
-import android.annotation.SuppressLint;
-
 import com.wildplot.android.parsing.Atom;
 import com.wildplot.android.parsing.ExpressionFormatException;
 import com.wildplot.android.parsing.TopLevelParser;
@@ -25,7 +23,6 @@ import com.wildplot.android.parsing.TreeElement;
 import java.util.regex.Pattern;
 
 
-@SuppressLint("NonPublicNonStaticFieldName")
 public class VariableAtom implements TreeElement {
 
     private Atom.AtomType atomType = Atom.AtomType.NUMBER;

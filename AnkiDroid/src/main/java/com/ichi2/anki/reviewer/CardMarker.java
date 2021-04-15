@@ -26,22 +26,22 @@ public class CardMarker {
     public @interface FlagDef {}
 
     @NonNull
-    private final ImageView mMarkView;
+    private final ImageView markView;
     @NonNull
-    private final ImageView mFlagView;
+    private final ImageView flagView;
 
     public CardMarker(@NonNull ImageView markView, @NonNull ImageView flagView) {
-        this.mMarkView = markView;
-        this.mFlagView = flagView;
+        this.markView = markView;
+        this.flagView = flagView;
     }
 
     /** Sets the mark icon on a card (the star) */
     public void displayMark(boolean markStatus) {
         if (markStatus) {
-            mMarkView.setVisibility(View.VISIBLE);
-            mMarkView.setImageResource(R.drawable.ic_star_white_bordered_24dp);
+            markView.setVisibility(View.VISIBLE);
+            markView.setImageResource(R.drawable.ic_star_white_bordered_24dp);
         } else {
-            mMarkView.setVisibility(View.INVISIBLE);
+            markView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -62,7 +62,7 @@ public class CardMarker {
                 break;
             case FLAG_NONE:
             default:
-                mFlagView.setVisibility(View.INVISIBLE);
+                flagView.setVisibility(View.INVISIBLE);
                 break;
         }
     }
@@ -70,7 +70,7 @@ public class CardMarker {
 
     private void setFlagView(@DrawableRes int drawableId) {
         //set the resource before to ensure we display the correct icon.
-        mFlagView.setImageResource(drawableId);
-        mFlagView.setVisibility(View.VISIBLE);
+        flagView.setImageResource(drawableId);
+        flagView.setVisibility(View.VISIBLE);
     }
 }

@@ -68,7 +68,7 @@ public class MultimediaEditFieldActivity extends AnkiActivity
     private static final int REQUEST_AUDIO_PERMISSION = 0;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
-    public static final int IMAGE_LIMIT = 1024 * 1024; // 1MB in bytes
+    public static final int sImageLimit = 1024 * 1024; // 1MB in bytes
 
     private IField mField;
     private IMultimediaEditableNote mNote;
@@ -263,8 +263,8 @@ public class MultimediaEditFieldActivity extends AnkiActivity
                     bChangeToText = true;
                 } else {
                     long length = f.length();
-                    if (length > IMAGE_LIMIT) {
-                        showLargeFileCropDialog((float) (1.0 * length / IMAGE_LIMIT));
+                    if (length > sImageLimit) {
+                        showLargeFileCropDialog((float) (1.0 * length / sImageLimit));
                         return;
                     }
                 }
@@ -342,14 +342,13 @@ public class MultimediaEditFieldActivity extends AnkiActivity
         recreateEditingUi(mCurrentChangeRequest);
     }
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (mCurrentChangeRequest == null) {
             cancelActivityWithAssertionFailure("mCurrentChangeRequest should be set before requesting permissions");
             return;
         }
 
         Timber.d("onRequestPermissionsResult. Code: %d", requestCode);
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_AUDIO_PERMISSION && permissions.length == 1) {
 
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -435,8 +434,8 @@ public class MultimediaEditFieldActivity extends AnkiActivity
 
     /** Intermediate class to hold state for the onRequestPermissionsResult callback */
     private final static class ChangeUIRequest {
-        private final IField mNewField;
-        private final int mState;
+        private final IField newField;
+        private final int state;
         private boolean mRequiresPermissionCheck = true;
 
         /** Initial request when activity is created */
@@ -447,12 +446,12 @@ public class MultimediaEditFieldActivity extends AnkiActivity
         public static final int EXTERNAL_FIELD_CHANGE = 2;
 
         private ChangeUIRequest(IField field, int state) {
-            this.mNewField = field;
-            this.mState = state;
+            this.newField = field;
+            this.state = state;
         }
 
         private IField getField() {
-            return mNewField;
+            return newField;
         }
 
         private static ChangeUIRequest init(@NonNull IField field) {
@@ -476,7 +475,7 @@ public class MultimediaEditFieldActivity extends AnkiActivity
         }
 
         private int getState() {
-            return mState;
+            return state;
         }
     }
 
@@ -535,7 +534,7 @@ public class MultimediaEditFieldActivity extends AnkiActivity
 
         private static void onRequiredPermissionDenied(ChangeUIRequest request, MultimediaEditFieldActivity activity) {
             Timber.d("onRequiredPermissionDenied. State: %d", request.getState());
-            switch (request.mState) {
+            switch (request.state) {
                 case ChangeUIRequest.ACTIVITY_LOAD:
                     activity.finishCancel();
                     break;

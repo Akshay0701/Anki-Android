@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Ջնջե՞լ այս գրառումը և նրա բոլոր քարտերը:\n%s</string>
     <string name="menu_select">Ընտրել գրվածքը</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Որոնում %1$s-ում</string>
     <string name="menu_mark_note">Նշել գրառումը</string>
     <string name="menu_unmark_note">Ապանշել գրառումը</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">Ուսուցման լրացուցիչ աշխատաշրջան</string>
     <string name="custom_study_deck_exists">Սկզբում վերանվանել լրացուցիչ ուսուցման առկա կապուկը</string>
     <string name="empty_deck">Այս կապուկը դատարկ է</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">Կապուկը դատարկ է: Սեղմեք + կոճակը նոր բովանդակություն ավելացնելու համար:</string>

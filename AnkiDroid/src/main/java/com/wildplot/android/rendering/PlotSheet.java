@@ -16,13 +16,9 @@
 package com.wildplot.android.rendering;
 
 
-import android.annotation.SuppressLint;
 import android.graphics.Typeface;
 
-import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
-import com.wildplot.android.rendering.graphics.wrapper.FontMetricsWrap;
-import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
-import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.graphics.wrapper.*;
 import com.wildplot.android.rendering.interfaces.Drawable;
 import com.wildplot.android.rendering.interfaces.Legendable;
 
@@ -39,7 +35,6 @@ import timber.log.Timber;
  * This is a sheet that is used to plot mathematical functions including coordinate systems and optional extras like
  * legends and descriptors. Additionally all conversions from image to plot coordinates are done here
  */
-@SuppressLint("NonPublicNonStaticFieldName")
 public class PlotSheet implements Drawable {
 
     protected Typeface typeface = Typeface.DEFAULT;

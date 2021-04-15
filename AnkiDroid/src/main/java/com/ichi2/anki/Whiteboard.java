@@ -85,7 +85,7 @@ public class Whiteboard extends View {
     private boolean mSecondFingerWithinTapTolerance;
     private boolean mCurrentlyDrawing = false;
     private boolean mUndoModeActive = false;
-    private final int mForegroundColor;
+    private final int foregroundColor;
     private final LinearLayout mColorPalette;
 
     @Nullable
@@ -101,17 +101,17 @@ public class Whiteboard extends View {
         if (!inverted) {
                 whitePenColorButton.setVisibility(View.GONE);
                 blackPenColorButton.setOnClickListener(this::onClick);
-                mForegroundColor = Color.BLACK;
+                foregroundColor = Color.BLACK;
         } else {
                 blackPenColorButton.setVisibility(View.GONE);
                 whitePenColorButton.setOnClickListener(this::onClick);
-                mForegroundColor = Color.WHITE;
+                foregroundColor = Color.WHITE;
         }
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(mForegroundColor);
+        mPaint.setColor(foregroundColor);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -592,7 +592,7 @@ public class Whiteboard extends View {
 
         File saveWhiteboardImageFile = new File(ankiDroidFolder, finalFileName);
 
-        if (mForegroundColor != Color.BLACK) {
+        if (foregroundColor != Color.BLACK) {
             canvas.drawColor(Color.BLACK);
         } else {
             canvas.drawColor(Color.WHITE);
@@ -606,7 +606,7 @@ public class Whiteboard extends View {
     @VisibleForTesting
     @CheckResult
     protected int getForegroundColor() {
-        return mForegroundColor;
+        return foregroundColor;
     }
 
     public interface OnPaintColorChangeListener {

@@ -2,31 +2,30 @@ package com.ichi2.libanki;
 
 import android.content.res.Resources;
 
-import com.ichi2.utils.LanguageUtil;
+import com.ichi2.libanki.Collection.DismissType;
 
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import timber.log.Timber;
 
-public abstract class UndoAction {
-    @StringRes public final int mUndoNameId;
+public abstract class Undoable {
+    private final DismissType mDt;
 
     /**
      * For all descendants, we assume that a card/note/object passed as argument is never going to be changed again.
      * It's the caller reponsability to clone the object if necessary.*/
-    public UndoAction(@StringRes int undoNameId) {
-        mUndoNameId = undoNameId;
+    public Undoable(DismissType dt) {
+        mDt = dt;
     }
 
-    private Locale getLocale(Resources resources) {
-        return LanguageUtil.getLocaleCompat(resources);
-    }
     public String name(Resources res) {
-        return res.getString(mUndoNameId).toLowerCase(getLocale(res));
+        return mDt.getString(res);
+    }
+
+    public DismissType getDismissType() {
+        return mDt;
     }
 
     /**
@@ -35,13 +34,13 @@ public abstract class UndoAction {
      * Returned positive integers are card id. Those ids is the card that was discarded and that may be sent back to the reviewer.*/
     public abstract @Nullable Card undo(@NonNull Collection col);
 
-    public static @NonNull UndoAction revertToProvidedState (@StringRes int undoNameId, Card card){
+    public static @NonNull Undoable revertToProvidedState (DismissType dt, Card card){
         Note note = card.note();
         List<Card> cards = note.cards();
-        return new UndoAction(undoNameId) {
+        return new Undoable(dt) {
             public @Nullable
             Card undo(@NonNull Collection col) {
-                Timber.i("Undo: %d", undoNameId);
+                Timber.i("Undo: %s", dt);
                 for (Card cc : cards) {
                     cc.flush(false);
                 }

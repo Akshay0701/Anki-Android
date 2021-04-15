@@ -116,7 +116,6 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">Really delete this note and all its cards?\n%s</string>
     <string name="menu_select">Hautatu testua</string>
-    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Lookup in %1$s</string>
     <string name="menu_mark_note">Markatu oharra</string>
     <string name="menu_unmark_note">Desmarkatu oharra</string>
@@ -155,7 +154,6 @@
     <string name="custom_study_deck_name">Ikasketa saio pertsonalizatua</string>
     <string name="custom_study_deck_exists">Aldatu izena dagoen ikasketa sortari aurretik</string>
     <string name="empty_deck">Sorta hau hutsik dago</string>
-    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">Sorta hau hutsik dago. Sakatu + botoia edukia gehitzeko.</string>
