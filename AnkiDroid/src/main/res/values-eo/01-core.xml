@@ -116,6 +116,7 @@
     <string name="menu_edit_tags">Redakti etikedojn</string>
     <string name="delete_note_message">Ĉu vi certe volas forigi tiun ĉi noton kaj ĉiujn ĝiajn kartojn?\n%s</string>
     <string name="menu_select">Elekti tekston</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">Serĉi en %1$s</string>
     <string name="menu_mark_note">Marki noton</string>
     <string name="menu_unmark_note">Malmarki noton</string>
@@ -154,6 +155,7 @@
     <string name="custom_study_deck_name">Propra lernado</string>
     <string name="custom_study_deck_exists">Unue ŝanĝu nomon de kartaro por propra lernado</string>
     <string name="empty_deck">Tiu ĉi kartaro estas malplena</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Aldoni karton</string>
     <string name="invalid_deck_name">Malĝusta nomo por kartaro</string>
     <string name="studyoptions_empty">Tiu ĉi kartaro estas malplena. Frapetu la butonon “+” por aldoni novan enhavon.</string>

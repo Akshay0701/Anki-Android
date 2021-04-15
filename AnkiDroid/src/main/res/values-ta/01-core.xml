@@ -116,6 +116,7 @@
     <string name="menu_edit_tags">Edit tags</string>
     <string name="delete_note_message">உண்மையில் இந்த குறிப்பையும் அதன் அனைத்து அட்டைகளையும் நீக்கவா?\n%s</string>
     <string name="menu_select">உரை தேர்ந்தெடு</string>
+    <string name="menu_lookup">Lookup text</string>
     <string name="menu_search">இங்கே பாருங்கள் %1$s</string>
     <string name="menu_mark_note">குறிப்பு குறிக்கவும்</string>
     <string name="menu_unmark_note">குறிப்பு குறிக்கப்படாது</string>
@@ -154,6 +155,7 @@
     <string name="custom_study_deck_name">தனிப்பயன் ஆய்வு கூட்டம்</string>
     <string name="custom_study_deck_exists">தற்போதுள்ள விருப்ப ஆய்வு கட்டு முதலில் மறுபெயரிடு</string>
     <string name="empty_deck">இந்த கட்டு காலியாக உள்ளது</string>
+    <string name="search_deck">Deck Search</string>
     <string name="empty_deck_add_note">Add card</string>
     <string name="invalid_deck_name">Invalid deck name</string>
     <string name="studyoptions_empty">இந்த கட்டு காலியாக உள்ளது. பத்திரிகை, + புதிய உள்ளடக்கம் சேர்க்க பொத்தான்.</string>

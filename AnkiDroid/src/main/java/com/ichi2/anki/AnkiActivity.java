@@ -342,7 +342,7 @@ public class AnkiActivity extends AppCompatActivity implements SimpleMessageDial
                 Intent deckPicker = new Intent(this, DeckPicker.class);
                 deckPicker.putExtra("collectionLoadError", true); // don't currently do anything with this
                 deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivityWithAnimation(deckPicker, LEFT);
+                startActivityWithAnimation(deckPicker, START);
             }
         });
     }
@@ -605,7 +605,7 @@ public class AnkiActivity extends AppCompatActivity implements SimpleMessageDial
     }
 
     protected boolean showedActivityFailedScreen(Bundle savedInstanceState) {
-        if (!AnkiDroidApp.isInitialized()) {
+        if (AnkiDroidApp.isInitialized()) {
             return false;
         }
 
