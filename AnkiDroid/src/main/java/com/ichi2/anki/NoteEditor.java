@@ -269,12 +269,12 @@ public class NoteEditor extends AnkiActivity implements
         }
     }
 
-    private void displayDeckOverrideDialog(Collection col) {
-        FunctionalInterfaces.Filter<Deck> nonDynamic = (d) -> !Decks.isDynamic(d);
-        List<DeckSelectionDialog.SelectableDeck> decks = DeckSelectionDialog.SelectableDeck.fromCollection(col, nonDynamic);
-        DeckSelectionDialog dialog = DeckSelectionDialog.newInstance(getString(R.string.search_deck), null, false, decks);
-        AnkiActivity.showDialogFragment(NoteEditor.this, dialog);
-    }
+//    private void displayDeckOverrideDialog(Collection col) {
+//        FunctionalInterfaces.Filter<Deck> nonDynamic = (d) -> !Decks.isDynamic(d);
+//        List<DeckSelectionDialog.SelectableDeck> decks = DeckSelectionDialog.SelectableDeck.fromCollection(col, nonDynamic);
+//        DeckSelectionDialog dialog = DeckSelectionDialog.newInstance(getString(R.string.search_deck), null, false, decks);
+//        AnkiActivity.showDialogFragment(NoteEditor.this, dialog);
+//    }
 
     private enum AddClozeType {
         SAME_NUMBER,
@@ -644,13 +644,16 @@ public class NoteEditor extends AnkiActivity implements
                 return tv;
             }
         };
+//        displayDeckOverrideDialog(getCol());
         mNoteDeckSpinner.setAdapter(noteDeckAdapter);
         noteDeckAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mNoteDeckSpinner.setOnTouchListener(new View.OnTouchListener() {
 
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                        displayDeckOverrideDialog(getCol());
+                        SwtichProfileDialog swtichProfileDialog = new SwtichProfileDialog(NoteEditor.this);
+//                        AnkiActivity.showDialogFragment(NoteEditor.this, swtichProfileDialog);
+//                        displayDeckOverrideDialog(getCol());
                     }
                     return true;
                 }
@@ -786,7 +789,7 @@ public class NoteEditor extends AnkiActivity implements
             case KeyEvent.KEYCODE_D:
                 //null check in case Spinner is moved into options menu in the future
                 if (event.isCtrlPressed() && (mNoteDeckSpinner != null)) {
-                    displayDeckOverrideDialog(getCol());
+//                    displayDeckOverrideDialog(getCol());
                 }
                 break;
 

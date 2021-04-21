@@ -40,6 +40,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -552,7 +553,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
         registerExternalStorageListener();
 
         SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(getBaseContext());
-
+        UIUtils.showThemedToast(this,"sss",true);
         // Load reference to action bar title
         mActionBarTitle = findViewById(R.id.toolbar_title);
 
@@ -721,6 +722,9 @@ public class CardBrowser extends NavigationDrawerActivity implements
         } else {
             selectDeckById(getCol().getDecks().selected());
         }
+
+//        SwtichProfileDialog swtichProfileDialog = SwtichProfileDialog.newInstance();
+//        AnkiActivity.showDialogFragment(CardBrowser.this, swtichProfileDialog);
     }
 
 

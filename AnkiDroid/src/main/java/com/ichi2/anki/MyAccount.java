@@ -1,16 +1,3 @@
-/***************************************************************************************
- * This program is free software; you can redistribute it and/or modify it under        *
- * the terms of the GNU General Public License as published by the Free Software        *
- * Foundation; either version 3 of the License, or (at your option) any later           *
- * version.                                                                             *
- *                                                                                      *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
- * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
- *                                                                                      *
- * You should have received a copy of the GNU General Public License along with         *
- * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
- ****************************************************************************************/
 
 package com.ichi2.anki;
 
@@ -36,6 +23,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ichi2.anki.web.HostNumFactory;
 import com.ichi2.async.Connection;
 import com.ichi2.async.Connection.Payload;
@@ -43,11 +32,17 @@ import com.ichi2.themes.StyledProgressDialog;
 import com.ichi2.ui.TextInputEditField;
 import com.ichi2.utils.AdaptionUtil;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import timber.log.Timber;
 
 import static com.ichi2.anim.ActivityTransitionAnimation.Direction.FADE;
+import static com.ichi2.anim.ActivityTransitionAnimation.Direction.START;
 
 public class MyAccount extends AnkiActivity {
     private final static int STATE_LOG_IN  = 1;
@@ -66,6 +61,9 @@ public class MyAccount extends AnkiActivity {
     private TextInputLayout mPasswordLayout;
 
     private ImageView mAnkidroidLogo;
+
+    private SwtichProfileDialog.Profile mProfile;
+    private boolean mSaveDetailsInProfile;
 
     private void switchToState(int newState) {
         switch (newState) {
@@ -109,6 +107,12 @@ public class MyAccount extends AnkiActivity {
         mayOpenUrl(Uri.parse(getResources().getString(R.string.register_url)));
         initAllContentViews();
 
+        // check if this acitivity call from swtichProfileDialog
+        Intent intent = getIntent();
+        mProfile = (SwtichProfileDialog.Profile) intent.getSerializableExtra("profile");
+        checkProfileSelected();
+
+
         SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(getBaseContext());
         if (preferences.getString("hkey", "").length() > 0) {
             switchToState(STATE_LOGGED_IN);
@@ -124,11 +128,49 @@ public class MyAccount extends AnkiActivity {
     }
 
 
+    private void checkProfileSelected() {
+        if (mProfile != null) {
+            String email = AnkiDroidApp.getSharedPrefs(getBaseContext()).getString("username", "");
+            if(mProfile.getEmail().equals(email)) {
+                // user selected same profile
+                UIUtils.showThemedToast(this,"Already Logged In User",true);
+                Intent intent = new Intent(MyAccount.this, DeckPicker.class);
+                startActivityWithAnimation(intent, START);
+                mSaveDetailsInProfile = false;
+            } else {
+                //logging out previous user
+                logout();
+                if (!mProfile.getEmail().isEmpty() && !mProfile.getPassword().isEmpty()) {
+                    // selected profile has login credentails do direct attempt login
+                    String username = mProfile.getEmail().toString().trim(); // trim spaces, issue 1586
+                    String password = mProfile.getPassword().toString();
+
+                    if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
+                        mProfile.setEmail(username);
+                        mProfile.setPassword(password);
+                        Timber.i("Attempting auto-login");
+                        Connection.login(mLoginListener, new Payload(new Object[]{username, password,
+                                HostNumFactory.getInstance(this) }));
+                    } else {
+                        Timber.i("Auto-login cancelled - username/password missing");
+                    }
+                    mSaveDetailsInProfile = false;
+                } else {
+                    UIUtils.showThemedToast(this,"Login with your credentials",true);
+                    mSaveDetailsInProfile = true;
+                }
+            }
+        }
+    }
+
+
     public void attemptLogin() {
         String username = mUsername.getText().toString().trim(); // trim spaces, issue 1586
         String password = mPassword.getText().toString();
 
         if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
+            mProfile.setEmail(username);
+            mProfile.setPassword(password);
             Timber.i("Attempting auto-login");
             Connection.login(mLoginListener, new Connection.Payload(new Object[]{username, password,
                     HostNumFactory.getInstance(this) }));
@@ -144,6 +186,38 @@ public class MyAccount extends AnkiActivity {
         editor.putString("username", username);
         editor.putString("hkey", hkey);
         editor.apply();
+
+        if (mSaveDetailsInProfile) {
+            saveUserInProfileList();
+        }
+        Intent intent = new Intent(MyAccount.this, DeckPicker.class);
+        startActivityWithAnimation(intent, START);
+    }
+
+
+    private void saveUserInProfileList() {
+        SharedPreferences mPrefs = getSharedPreferences("SwtichProfile", Context.MODE_PRIVATE);
+        // creating a variable for gson.
+        Gson gson = new Gson();
+        String json = mPrefs.getString("profilesList", null);
+
+        // todo high priority error
+        Type type = new TypeToken<HashMap<String, SwtichProfileDialog.Profile>>() {}.getType();
+        HashMap<String, SwtichProfileDialog.Profile> profiles = gson.fromJson(json, type);
+
+        if (profiles == null) {
+            profiles = new HashMap<>();
+            profiles.put("Default",new SwtichProfileDialog.Profile("Default", "", ""));
+        }
+        // update values
+        profiles.put(mProfile.getUserName(), mProfile);
+
+        SharedPreferences.Editor editor = mPrefs.edit();
+        Gson gson2 = new Gson();
+        String json2 = gson2.toJson(profiles);
+        editor.putString("profilesList", json2);
+        editor.apply();
+
     }
 
 
