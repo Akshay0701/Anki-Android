@@ -191,6 +191,7 @@ public class MyAccount extends AnkiActivity {
             saveUserInProfileList();
         }
         Intent intent = new Intent(MyAccount.this, DeckPicker.class);
+        intent.putExtra("isSync",true);
         startActivityWithAnimation(intent, START);
     }
 

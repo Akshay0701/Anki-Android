@@ -525,7 +525,20 @@ public class DeckPicker extends NavigationDrawerActivity implements
         mReviewSummaryTextView = findViewById(R.id.today_stats_text_view);
 
         mShortAnimDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        checkSyncRequire();
     }
+
+
+    private void checkSyncRequire() {
+        Intent intent = getIntent();
+        boolean isSync = intent.getBooleanExtra("isSync",false);
+
+        if (isSync) {
+            sync();
+        }
+    }
+
 
     /**
      * The first call in showing dialogs for startup - error or success.

@@ -75,10 +75,10 @@ public class SwtichProfileDialog {
      *   -> if selected profile is the current profile then it will simple navigate to home page by message "Already logged In"
      *   -> else if selected profile has login credentials it will directly login
      *   -> else selected profile has no credentials then user have to login and then that credentials will store to list and page will navigate to home
+     * 5 After successfully switch, Deckpicker activity will automatically start sync method to resolve conflict between two different account data
      */
 
-
-    // todo sync need work to automate task
+    // todo sync work fine but still need work because we dont want user to click on all process to sync, it should automate like AnkiDesktop does.
     // todo create profile list in navigatgion page like gmail
 
 
