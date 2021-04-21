@@ -67,9 +67,20 @@ public class SwtichProfileDialog {
     private SwtichProfileDialog.ProfilesArrayAdapter mAdapter;
     private final String mSHARED_PREFS_ID = "SwtichProfile";
 
-    // todo error
-    // todo each time savelistcall list duplicates it self
-    // todo logout for all option , not work properly
+    /** work done till now
+     * 1 created list of profile
+     * 2 add profile
+     * 3 search profile // todo need more work
+     * 4 onClick of profile to goes to login page and to following computation
+     *   -> if selected profile is the current profile then it will simple navigate to home page by message "Already logged In"
+     *   -> else if selected profile has login credentials it will directly login
+     *   -> else selected profile has no credentials then user have to login and then that credentials will store to list and page will navigate to home
+     */
+
+
+    // todo sync need work to automate task
+    // todo create profile list in navigatgion page like gmail
+
 
 
     /**
