@@ -60,8 +60,7 @@ import static com.ichi2.anim.ActivityTransitionAnimation.Direction.FADE;
 
 public class SwtichProfileDialog {
 
-    private MaterialDialog mDialog;
-    private final MaterialDialog.Builder mBuilder;
+    private MaterialDialog.Builder mBuilder;
     private Context mContext;
     private  SharedPreferences mPrefs;
     private SwtichProfileDialog.ProfilesArrayAdapter mAdapter;
@@ -97,10 +96,13 @@ public class SwtichProfileDialog {
 
     public SwtichProfileDialog(@NonNull Context context) {
         this.mContext = context;
+        mPrefs = mContext.getSharedPreferences(mSHARED_PREFS_ID, Context.MODE_PRIVATE);
+    }
+
+    public void showSwtichProfileDialog() {
+
         View dialogView = LayoutInflater.from(mContext)
                 .inflate(R.layout.deck_picker_dialog, null, false);
-
-        mPrefs = mContext.getSharedPreferences(mSHARED_PREFS_ID, Context.MODE_PRIVATE);
 
         TextView summary = dialogView.findViewById(R.id.deck_picker_dialog_summary);
         summary.setVisibility(View.GONE);
@@ -120,11 +122,10 @@ public class SwtichProfileDialog {
 
         adjustToolbar(dialogView, mAdapter);
 
-        mBuilder = new MaterialDialog.Builder(context);
+        mBuilder = new MaterialDialog.Builder(mContext);
 
         mBuilder.neutralText(R.string.dialog_cancel)
                 .customView(dialogView, false).show();
-
     }
 
     public HashMap<String, Profile> getProfileList() {

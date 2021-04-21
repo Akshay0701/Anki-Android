@@ -35,6 +35,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ichi2.anki.dialogs.HelpDialog;
 import com.ichi2.themes.Themes;
@@ -131,6 +133,21 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
         }
         mDrawerToggle.setDrawerSlideAnimationEnabled(animationEnabled());
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        View header = mNavigationView.getHeaderView(0);
+        LinearLayout linearLayout = header.findViewById(R.id.MyAccountLayout);
+        linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SwtichProfileDialog swtichProfileDialog = new SwtichProfileDialog(mainView.getContext());
+                swtichProfileDialog.showSwtichProfileDialog();
+            }
+        });
+        TextView myAccountLogo = header.findViewById(R.id.my_account_logo_txt);
+        TextView myAccountUserName = header.findViewById(R.id.my_account_username_txt);
+        String username = AnkiDroidApp.getSharedPrefs(mainView.getContext()).getString("username", "");
+        myAccountLogo.setText(String.format("%s", Character.toUpperCase(username.charAt(0))));
+        myAccountUserName.setText(username);
     }
 
 

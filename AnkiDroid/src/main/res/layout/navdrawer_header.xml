@@ -2,9 +2,50 @@
     android:layout_width="match_parent"
     android:layout_height="150dp"
     android:orientation="vertical">
-    <ImageView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/navDrawerImage"
-        android:scaleType="centerCrop" />
+        android:layout_marginTop="20dp"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/navDrawerImage"
+            android:scaleType="centerCrop" />
+        <LinearLayout
+            android:id="@+id/MyAccountLayout"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/my_account_logo_txt"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:layout_gravity="start"
+                android:background="@drawable/square_background"
+                android:textSize="40dp"
+                android:textColor="@color/white"
+                android:text="J" />
+
+            <TextView
+                android:id="@+id/my_account_username_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:layout_gravity="start"
+                android:textSize="14dp"
+                android:maxLines="1"
+                android:layout_marginTop="10dp"
+                android:text="JadhavAkshay0701@gmail.com" />
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/id_expand_button"
+            android:layout_margin="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_width="30dp"
+            android:background="@drawable/ic_expand_more_white_24dp"
+            android:layout_height="30dp"></Button>
+    </RelativeLayout>
 </FrameLayout>
