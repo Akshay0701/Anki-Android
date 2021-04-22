@@ -1,5 +1,3 @@
-
-
 package com.ichi2.anki;
 
 import android.annotation.SuppressLint;
@@ -77,25 +75,8 @@ public class SwtichProfileDialog {
      *   -> if selected profile is the current profile then it will simple navigate to home page by message "Already logged In"
      *   -> else if selected profile has login credentials it will directly login
      *   -> else selected profile has no credentials then user have to login and then that credentials will store to list and page will navigate to home
-     * 5 After successfully switch, Deckpicker activity will automatically start sync method to resolve conflict between two different account data
+     * 5 After successfully switch, Dickpicker activity will restart with new collection path
      */
-
-    // todo sync work fine but still need work because we dont want user to click on all process to sync, it should automate like AnkiDesktop does.
-
-    // todo dont directly go to login its not complusory to login for user
-    // todo whenever user select profile just swtich profile and then change directory of collections
-
-    /**
-     * A dialog which handles selecting of user profile
-     */
-//    public static SwtichProfileDialog newInstance() {
-//        SwtichProfileDialog f = new SwtichProfileDialog();
-//        Bundle args = new Bundle();
-//        f.setArguments(args);
-//        return f;
-//        // save the task list to preference
-//    }
-
 
     public SwtichProfileDialog(@NonNull Context context) {
         this.mContext = context;
