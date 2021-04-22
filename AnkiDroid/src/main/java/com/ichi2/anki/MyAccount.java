@@ -132,8 +132,10 @@ public class MyAccount extends AnkiActivity {
         if (mProfile != null) {
             logout();
             if (mProfile.getEmail().isEmpty() && mProfile.getPassword().isEmpty()) {
+                // current profile not already logged in, so let user login
                 mSaveDetailsInProfile = true;
             } else {
+                // current profile previously logged in, direct login and no need to save details in profile
                 String username = mProfile.getEmail().toString().trim(); // trim spaces, issue 1586
                 String password = mProfile.getPassword().toString();
 
@@ -146,6 +148,7 @@ public class MyAccount extends AnkiActivity {
                 }
             }
         } else {
+            // current profile not already logged in, so let user login
             mSaveDetailsInProfile = true;
         }
     }

@@ -237,30 +237,36 @@ public class SwtichProfileDialog {
     }
 
     protected void onProfileSelected(@NonNull Profile profile) {
-        String username = AnkiDroidApp.getSharedPrefs(mContext).getString("deckPath", "Default").substring(20);
-        if (profile.getEmail().isEmpty() && profile.getPassword().isEmpty()) {
-            SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
-            preferences.edit().putString("deckPath", "/storage/emulated/0/" + profile.getUserName()).apply();
-            // logout
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("username", "");
-            editor.putString("hkey", "");
-            editor.apply();
-            HostNumFactory.getInstance(mContext).reset();
-            //  force media resync on deauth
-            new AnkiActivity().getCol().getMedia().forceResync();
-            // restart
-            restartWithNewDeckPicker();
-        } else if (profile.getUserName().equals(username)){
+        SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+        String username = preferences.getString("deckPath", "Default").substring(20);
+        if (profile.getUserName().equals(username)){
             // no change
             UIUtils.showThemedToast(mContext,"selected already logged profile",true);
+        } else if (profile.getEmail().isEmpty() && profile.getPassword().isEmpty()) {
+            // create new profile
+            createNewProfile(profile.getUserName());
         } else {
-            SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+            // profile has login info, so direct log in to account
             preferences.edit().putString("deckPath", "/storage/emulated/0/" + profile.getUserName()).apply();
             Intent intent = new Intent(mContext,MyAccount.class);
             intent.putExtra("profile", (Serializable) profile);
             mContext.startActivity(intent);
         }
+    }
+
+    private void createNewProfile(String profileName) {
+        SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+        preferences.edit().putString("deckPath", "/storage/emulated/0/" + profileName).apply();
+        // logout
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("username", "");
+        editor.putString("hkey", "");
+        editor.apply();
+        HostNumFactory.getInstance(mContext).reset();
+        //  force media resync on deauth
+        new AnkiActivity().getCol().getMedia().forceResync();
+        // restart
+        restartWithNewDeckPicker();
     }
 
     protected void restartWithNewDeckPicker() {
@@ -269,6 +275,27 @@ public class SwtichProfileDialog {
         Intent deckPicker = new Intent(mContext, DeckPicker.class);
         deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(deckPicker);
+    }
+
+    protected void deleteSeletedProfile(String profileName) {
+        new MaterialDialog.Builder(mContext)
+                .title("Delete "+ profileName)
+                .positiveText(R.string.dialog_ok)
+                .negativeText(R.string.dialog_cancel)
+                .onPositive((dialog, which) -> {
+                    mAdapter.mProfileArrayList.remove(profileName);
+                    saveList(mAdapter.mProfileArrayList);
+                    mBuilder.show().dismiss();
+                    // check if user deleting current profile
+                    SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+                    if (preferences.getString("deckPath","Default").substring(20).equals(profileName)) {
+                        preferences.edit().putString("deckPath", "/storage/emulated/0/Default").apply();
+                        Intent intent = new Intent(mContext,MyAccount.class);
+                        intent.putExtra("profile", (Parcelable) mAdapter.mProfileArrayList.get("Default"));
+                        mContext.startActivity(intent);
+                    }
+                })
+                .show();
     }
 
     protected void selectProfileAndClose(@NonNull SwtichProfileDialog.Profile profile) {
@@ -282,8 +309,18 @@ public class SwtichProfileDialog {
                 super(ctv);
                 mDeckTextView = ctv;
                 mDeckTextView.setOnClickListener(view -> {
-                    String deckName = ctv.getText().toString();
-                    selectProfileByNameAndClose(deckName);
+                    String profileName = ctv.getText().toString();
+                    selectProfileByNameAndClose(profileName);
+                });
+
+                mDeckTextView.setOnLongClickListener(view -> {
+                    String profileName = ctv.getText().toString();
+                    if (!profileName.equals("Default")) {
+                        deleteSeletedProfile(profileName);
+                    } else {
+                        UIUtils.showThemedToast(mContext,R.string.default_conf_delete_error,true);
+                    }
+                    return true;
                 });
             }
 
