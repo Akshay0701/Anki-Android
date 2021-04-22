@@ -30,9 +30,11 @@ import com.ichi2.anki.dialogs.DeckSelectionDialog;
 import com.ichi2.anki.web.HostNumFactory;
 import com.ichi2.async.Connection;
 import com.ichi2.libanki.Utils;
+import com.ichi2.preferences.PreferenceExtensions;
 import com.ichi2.themes.StyledProgressDialog;
 import com.ichi2.ui.FixedEditText;
 import com.ichi2.utils.FilterResultsUtils;
+import com.ichi2.utils.FunctionalInterfaces;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -57,6 +59,7 @@ import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static com.ichi2.anim.ActivityTransitionAnimation.Direction.FADE;
+import static com.ichi2.anim.ActivityTransitionAnimation.Direction.START;
 
 public class SwtichProfileDialog {
 
@@ -78,9 +81,9 @@ public class SwtichProfileDialog {
      */
 
     // todo sync work fine but still need work because we dont want user to click on all process to sync, it should automate like AnkiDesktop does.
-    // todo create profile list in navigatgion page like gmail
 
-
+    // todo dont directly go to login its not complusory to login for user
+    // todo whenever user select profile just swtich profile and then change directory of collections
 
     /**
      * A dialog which handles selecting of user profile
@@ -117,7 +120,7 @@ public class SwtichProfileDialog {
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         HashMap<String, Profile> profiles = getProfileList();
-        mAdapter = new SwtichProfileDialog.ProfilesArrayAdapter(profiles,profiles.keySet(),profiles.values());
+        mAdapter = new SwtichProfileDialog.ProfilesArrayAdapter(profiles, profiles.values());
         recyclerView.setAdapter(mAdapter);
 
         adjustToolbar(dialogView, mAdapter);
@@ -156,7 +159,7 @@ public class SwtichProfileDialog {
         return profiles;
     }
 
-    private void saveList(HashMap<String, Profile> profiles) {
+    public void saveList(HashMap<String, Profile> profiles) {
 
         SharedPreferences.Editor editor = mPrefs.edit();
 
@@ -201,13 +204,6 @@ public class SwtichProfileDialog {
             }
         });
 
-        // todo create add new profile option
-
-        // todo onlick of add option new dialog will open which will take users input of username of that profile
-
-        // todo then with input username create new profile object with email and password  empty and add to profileList
-        // saveList(add list with added porfile object init ex - profiles.add(profile));
-
         MenuItem addDecks = mToolbar.getMenu().findItem(R.id.deck_picker_dialog_action_add_deck);
         addDecks.setOnMenuItemClickListener(menuItem -> {
             // creating new deck without any parent deck
@@ -222,7 +218,7 @@ public class SwtichProfileDialog {
      */
     private void addProfileDialog() {
         EditText mDialogEditText = new FixedEditText(mContext);
-        MaterialDialog addProfileDialog = new MaterialDialog.Builder(mContext)
+        new MaterialDialog.Builder(mContext)
                 .title("Create Profile")
                 .positiveText(R.string.dialog_ok)
                 .customView(mDialogEditText, true)
@@ -234,30 +230,50 @@ public class SwtichProfileDialog {
     private void addProfiletoList(String newProfileName) {
         if (!newProfileName.isEmpty()) {
             Profile profile = new Profile(newProfileName, "", "");
-            mAdapter.mProfileArrayList.put(profile.mUserName, profile);
+            mAdapter.mProfileArrayList.put(profile.getUserName(), profile);
             saveList(mAdapter.mProfileArrayList);
-//            mAdapter.notifyDataSetChanged();
             selectProfileAndClose(profile);
         }
     }
 
-    protected void onProfileSelected(@Nullable Profile profile) {
-        // profile has login credential so directly login
-        Intent intent = new Intent(mContext, MyAccount.class);
-        //To pass:
-        intent.putExtra("profile", (Serializable) profile);
-        mContext.startActivity(intent);
+    protected void onProfileSelected(@NonNull Profile profile) {
+        String username = AnkiDroidApp.getSharedPrefs(mContext).getString("deckPath", "Default").substring(20);
+        if (profile.getEmail().isEmpty() && profile.getPassword().isEmpty()) {
+            SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+            preferences.edit().putString("deckPath", "/storage/emulated/0/" + profile.getUserName()).apply();
+            // logout
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("username", "");
+            editor.putString("hkey", "");
+            editor.apply();
+            HostNumFactory.getInstance(mContext).reset();
+            //  force media resync on deauth
+            new AnkiActivity().getCol().getMedia().forceResync();
+            // restart
+            restartWithNewDeckPicker();
+        } else if (profile.getUserName().equals(username)){
+            // no change
+            UIUtils.showThemedToast(mContext,"selected already logged profile",true);
+        } else {
+            SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
+            preferences.edit().putString("deckPath", "/storage/emulated/0/" + profile.getUserName()).apply();
+            Intent intent = new Intent(mContext,MyAccount.class);
+            intent.putExtra("profile", (Serializable) profile);
+            mContext.startActivity(intent);
+        }
     }
 
-    @SuppressLint("DirectToastMakeTextUsage")
+    protected void restartWithNewDeckPicker() {
+        // PERF: DB access on foreground thread
+        CollectionHelper.getInstance().closeCollection(true, "Preference Modification: collection path changed");
+        Intent deckPicker = new Intent(mContext, DeckPicker.class);
+        deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(deckPicker);
+    }
+
     protected void selectProfileAndClose(@NonNull SwtichProfileDialog.Profile profile) {
         onProfileSelected(profile);
     }
-
-    protected void displayErrorAndCancel() {
-//        mDialog.dismiss();
-    }
-
 
     public class ProfilesArrayAdapter extends RecyclerView.Adapter<SwtichProfileDialog.ProfilesArrayAdapter.ViewHolder> implements Filterable {
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -271,33 +287,27 @@ public class SwtichProfileDialog {
                 });
             }
 
-
             public void setDeck(@NonNull SwtichProfileDialog.Profile profile) {
                 mDeckTextView.setText(profile.getUserName());
             }
         }
 
         private final HashMap<String, Profile> mProfileArrayList = new HashMap<>();
-        private final ArrayList<String> mKeySet = new ArrayList<>();
         private final ArrayList<Profile> mValueSet = new ArrayList<>();
 
-        public ProfilesArrayAdapter(@NonNull HashMap<String, Profile> profileArrayList, @NonNull Set<String> keySet, @NonNull Collection<Profile> valueSet) {
+        public ProfilesArrayAdapter(@NonNull HashMap<String, Profile> profileArrayList, @NonNull Collection<Profile> valueSet) {
             mProfileArrayList.putAll(profileArrayList);
-            mKeySet.addAll(keySet);
             mValueSet.addAll(valueSet);
-//            Collections.sort(mProfileArrayList);
         }
 
         @SuppressLint("DirectToastMakeTextUsage")
         protected void selectProfileByNameAndClose(@NonNull String deckName) {
             for (Map.Entry<String, Profile> p : mProfileArrayList.entrySet()) {
                 if (p.getValue().getUserName().equals(deckName)) {
-                    Toast.makeText(mContext,p.getValue().getUserName()+" "+p.getValue().getPassword(),Toast.LENGTH_LONG);
                     selectProfileAndClose(p.getValue());
                     return;
                 }
             }
-            displayErrorAndCancel();
         }
 
         @NonNull
@@ -327,7 +337,6 @@ public class SwtichProfileDialog {
             return new SwtichProfileDialog.ProfilesArrayAdapter.DecksFilter();
         }
 
-        /* Custom Filter class - as seen in http://stackoverflow.com/a/29792313/1332026 */
         private class DecksFilter extends Filter {
             private final HashMap<String, Profile> mProfileArrayList;
             protected DecksFilter() {

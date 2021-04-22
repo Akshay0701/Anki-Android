@@ -145,9 +145,9 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
         });
         TextView myAccountLogo = header.findViewById(R.id.my_account_logo_txt);
         TextView myAccountUserName = header.findViewById(R.id.my_account_username_txt);
-        String username = AnkiDroidApp.getSharedPrefs(mainView.getContext()).getString("username", "");
-        myAccountLogo.setText(String.format("%s", Character.toUpperCase(username.charAt(0))));
-        myAccountUserName.setText(username);
+        String username = AnkiDroidApp.getSharedPrefs(mainView.getContext()).getString("deckPath", "Default");
+        myAccountLogo.setText(String.format("%s", Character.toUpperCase(username.substring(20).charAt(0))));
+        myAccountUserName.setText(username.substring(20));
     }
 
 

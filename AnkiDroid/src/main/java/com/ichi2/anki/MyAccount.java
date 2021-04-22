@@ -130,49 +130,35 @@ public class MyAccount extends AnkiActivity {
 
     private void checkProfileSelected() {
         if (mProfile != null) {
-            String email = AnkiDroidApp.getSharedPrefs(getBaseContext()).getString("username", "");
-            if(mProfile.getEmail().equals(email)) {
-                // user selected same profile
-                UIUtils.showThemedToast(this,"Already Logged In User",true);
-                Intent intent = new Intent(MyAccount.this, DeckPicker.class);
-                startActivityWithAnimation(intent, START);
-                mSaveDetailsInProfile = false;
+            logout();
+            if (mProfile.getEmail().isEmpty() && mProfile.getPassword().isEmpty()) {
+                mSaveDetailsInProfile = true;
             } else {
-                //logging out previous user
-                logout();
-                if (!mProfile.getEmail().isEmpty() && !mProfile.getPassword().isEmpty()) {
-                    // selected profile has login credentails do direct attempt login
-                    String username = mProfile.getEmail().toString().trim(); // trim spaces, issue 1586
-                    String password = mProfile.getPassword().toString();
+                String username = mProfile.getEmail().toString().trim(); // trim spaces, issue 1586
+                String password = mProfile.getPassword().toString();
 
-                    if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
-                        mProfile.setEmail(username);
-                        mProfile.setPassword(password);
-                        Timber.i("Attempting auto-login");
-                        Connection.login(mLoginListener, new Payload(new Object[]{username, password,
-                                HostNumFactory.getInstance(this) }));
-                    } else {
-                        Timber.i("Auto-login cancelled - username/password missing");
-                    }
-                    mSaveDetailsInProfile = false;
+                if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
+                    Timber.i("Attempting auto-login");
+                    Connection.login(mLoginListener, new Connection.Payload(new Object[]{username, password,
+                            HostNumFactory.getInstance(this) }));
                 } else {
-                    UIUtils.showThemedToast(this,"Login with your credentials",true);
-                    mSaveDetailsInProfile = true;
+                    Timber.i("Auto-login cancelled - username/password missing");
                 }
             }
+        } else {
+            mSaveDetailsInProfile = true;
         }
     }
 
 
     public void attemptLogin() {
-        String username = mUsername.getText().toString().trim(); // trim spaces, issue 1586
+        String email = mUsername.getText().toString().trim(); // trim spaces, issue 1586
         String password = mPassword.getText().toString();
-
-        if (!"".equalsIgnoreCase(username) && !"".equalsIgnoreCase(password)) {
-            mProfile.setEmail(username);
-            mProfile.setPassword(password);
+        String username = AnkiDroidApp.getSharedPrefs(this).getString("deckPath", "Default").substring(20);
+        if (!"".equalsIgnoreCase(email) && !"".equalsIgnoreCase(password)) {
+            mProfile = new SwtichProfileDialog.Profile(username, email, password);
             Timber.i("Attempting auto-login");
-            Connection.login(mLoginListener, new Connection.Payload(new Object[]{username, password,
+            Connection.login(mLoginListener, new Connection.Payload(new Object[]{email, password,
                     HostNumFactory.getInstance(this) }));
         } else {
             Timber.i("Auto-login cancelled - username/password missing");
@@ -190,35 +176,21 @@ public class MyAccount extends AnkiActivity {
         if (mSaveDetailsInProfile) {
             saveUserInProfileList();
         }
-        Intent intent = new Intent(MyAccount.this, DeckPicker.class);
-        intent.putExtra("isSync",true);
-        startActivityWithAnimation(intent, START);
     }
 
+    protected void restartWithNewDeckPicker() {
+        // PERF: DB access on foreground thread
+        CollectionHelper.getInstance().closeCollection(true, "Preference Modification: collection path changed");
+        Intent deckPicker = new Intent(MyAccount.this, DeckPicker.class);
+        deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivityWithAnimation(deckPicker, START);
+    }
 
     private void saveUserInProfileList() {
-        SharedPreferences mPrefs = getSharedPreferences("SwtichProfile", Context.MODE_PRIVATE);
-        // creating a variable for gson.
-        Gson gson = new Gson();
-        String json = mPrefs.getString("profilesList", null);
-
-        // todo high priority error
-        Type type = new TypeToken<HashMap<String, SwtichProfileDialog.Profile>>() {}.getType();
-        HashMap<String, SwtichProfileDialog.Profile> profiles = gson.fromJson(json, type);
-
-        if (profiles == null) {
-            profiles = new HashMap<>();
-            profiles.put("Default",new SwtichProfileDialog.Profile("Default", "", ""));
-        }
-        // update values
+        SwtichProfileDialog swtichProfileDialog = new SwtichProfileDialog(MyAccount.this);
+        HashMap<String, SwtichProfileDialog.Profile> profiles = swtichProfileDialog.getProfileList();
         profiles.put(mProfile.getUserName(), mProfile);
-
-        SharedPreferences.Editor editor = mPrefs.edit();
-        Gson gson2 = new Gson();
-        String json2 = gson2.toJson(profiles);
-        editor.putString("profilesList", json2);
-        editor.apply();
-
+        swtichProfileDialog.saveList(profiles);
     }
 
 
@@ -347,7 +319,7 @@ public class MyAccount extends AnkiActivity {
             if (data.success) {
                 Timber.i("User successfully logged in!");
                 saveUserInformation((String) data.data[0], (String) data.data[1]);
-
+                restartWithNewDeckPicker();
                 Intent i = MyAccount.this.getIntent();
                 if (i.hasExtra("notLoggedIn") && i.getExtras().getBoolean("notLoggedIn", false)) {
                     MyAccount.this.setResult(RESULT_OK, i);
