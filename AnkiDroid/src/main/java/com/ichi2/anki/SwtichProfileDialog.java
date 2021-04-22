@@ -133,7 +133,7 @@ public class SwtichProfileDialog {
             // if the array list is empty
             // creating a new array list.
             profiles = new HashMap<>();
-            profiles.put("Default",new Profile("Default", "", ""));
+            profiles.put("AnkiDroid",new Profile("AnkiDroid", "", ""));
         }
 
         // return parsed list
@@ -219,7 +219,7 @@ public class SwtichProfileDialog {
 
     protected void onProfileSelected(@NonNull Profile profile) {
         SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
-        String username = preferences.getString("deckPath", "Default").substring(20);
+        String username = preferences.getString("deckPath", "/storage/emulated/0/AnkiDroid").substring(20);
         if (profile.getUserName().equals(username)){
             // no change
             UIUtils.showThemedToast(mContext,"selected already logged profile",true);
@@ -270,7 +270,7 @@ public class SwtichProfileDialog {
                     // check if user deleting current profile
                     SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(mContext);
                     if (preferences.getString("deckPath","Default").substring(20).equals(profileName)) {
-                        preferences.edit().putString("deckPath", "/storage/emulated/0/Default").apply();
+                        preferences.edit().putString("deckPath", "/storage/emulated/0/AnkiDroid").apply();
                         Intent intent = new Intent(mContext,MyAccount.class);
                         intent.putExtra("profile", (Parcelable) mAdapter.mProfileArrayList.get("Default"));
                         mContext.startActivity(intent);
@@ -296,7 +296,7 @@ public class SwtichProfileDialog {
 
                 mDeckTextView.setOnLongClickListener(view -> {
                     String profileName = ctv.getText().toString();
-                    if (!profileName.equals("Default")) {
+                    if (!profileName.equals("AnkiDroid")) {
                         deleteSeletedProfile(profileName);
                     } else {
                         UIUtils.showThemedToast(mContext,R.string.default_conf_delete_error,true);

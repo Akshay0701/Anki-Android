@@ -157,7 +157,7 @@ public class MyAccount extends AnkiActivity {
     public void attemptLogin() {
         String email = mUsername.getText().toString().trim(); // trim spaces, issue 1586
         String password = mPassword.getText().toString();
-        String username = AnkiDroidApp.getSharedPrefs(this).getString("deckPath", "Default").substring(20);
+        String username = AnkiDroidApp.getSharedPrefs(this).getString("deckPath", "/storage/emulated/0/AnkiDroid").substring(20);
         if (!"".equalsIgnoreCase(email) && !"".equalsIgnoreCase(password)) {
             mProfile = new SwtichProfileDialog.Profile(username, email, password);
             Timber.i("Attempting auto-login");
@@ -279,7 +279,14 @@ public class MyAccount extends AnkiActivity {
         mLoggedIntoMyAccountView = getLayoutInflater().inflate(R.layout.my_account_logged_in, null);
         mUsernameLoggedIn = mLoggedIntoMyAccountView.findViewById(R.id.username_logged_in);
         Button logoutButton = mLoggedIntoMyAccountView.findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(v -> logout());
+        logoutButton.setOnClickListener(v -> {
+            String username = AnkiDroidApp.getSharedPrefs(this).getString("deckPath", "/storage/emulated/0/AnkiDroid").substring(20);
+            SwtichProfileDialog swtichProfileDialog = new SwtichProfileDialog(MyAccount.this);
+            HashMap<String, SwtichProfileDialog.Profile> profiles = swtichProfileDialog.getProfileList();
+            profiles.put(username, new SwtichProfileDialog.Profile(username, "", ""));
+            swtichProfileDialog.saveList(profiles);
+            logout();
+        });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mPassword.setAutoFillListener((value) -> {
