@@ -99,7 +99,7 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
             return;
         }
         ExecEscaped safeString =  ExecEscaped.fromString(guid);
-        String safeCommand = String.format("deleteImage('%s')", safeString.getEscapedValue());
+        String safeCommand = String.format("deleteImage('%s')", safeString.getmEscapedValue());
         execUnsafe(safeCommand);
     }
 
@@ -107,7 +107,7 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
     public void pasteHtml(String html) {
         Timber.v("pasting: %s", html);
         ExecEscaped safeString = ExecEscaped.fromString(html);
-        execUnsafe("pasteHTML('" + safeString.getEscapedValue() + "');");
+        execUnsafe("pasteHTML('" + safeString.getmEscapedValue() + "');");
     }
 
     @Override
@@ -120,6 +120,6 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
     @Override
     public void setHtml(@NonNull String html) {
         ExecEscaped s = ExecEscaped.fromString(html);
-        execUnsafe("setHtml('" + s.getEscapedValue() + "');");
+        execUnsafe("setHtml('" + s.getmEscapedValue() + "');");
     }
 }

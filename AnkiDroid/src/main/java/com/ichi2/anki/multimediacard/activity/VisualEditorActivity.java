@@ -46,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.List;
 
 import androidx.annotation.CheckResult;
@@ -300,7 +299,6 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
             if (!registerMediaForWebView(field.getAudioPath())) {
                 return;
             }
-
             this.mWebView.pasteHtml(field.getFormattedValue());
             return;
         }
@@ -336,7 +334,7 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
         CardAppearance cardAppearance = CardAppearance.create(new ReviewerCustomFonts(this), preferences);
         String css = cardAppearance.getStyle();
         webView.injectCss(css);
-        webView.setOnTextChangeListener(s -> this.mCurrentText = s);
+        webView.setmOnTextChangeListener(s -> this.mCurrentText = s);
         webView.setSelectionChangedListener(this::handleSelectionChanged);
 
         webView.setHtml(mCurrentText);
@@ -446,7 +444,7 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
 
         JSONObject model = col.getModels().get(mModelId);
         String css = getModelCss(model);
-        if (Models.isCloze(model)) {
+        if (model != null && Models.isCloze(model)) {
             Timber.d("Cloze detected. Enabling Cloze button");
             findViewById(R.id.editor_button_cloze).setVisibility(View.VISIBLE);
         }
