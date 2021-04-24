@@ -119,7 +119,7 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
 
     @Override
     public void setHtml(@NonNull String html) {
-        ExecEscaped s = ExecEscaped.fromString(html);
+        ExecEscaped s = ExecEscaped.fromString(html.replaceAll(">\\s+<", "><"));
         execUnsafe("setHtml('" + s.getmEscapedValue() + "');");
     }
 }
