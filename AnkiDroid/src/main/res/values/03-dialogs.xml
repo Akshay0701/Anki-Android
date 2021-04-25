@@ -255,4 +255,8 @@
     sched V2. For V1, it was counting the number of repetitions of cards in learning. This approximation is acceptable
     for the sake of simplicity and because V1 will leave.-->
     <string name="deck_picker_counts">Open the deck overview page containing the number of cards to see today.</string>
+
+    <string name="visual_editor_could_not_start_add_image" tools:ignore="MissingTranslation">Unable to add image</string>
+    <string name="visual_editor_could_not_start_add_audio" tools:ignore="MissingTranslation">Unable to add audio</string>
+
 </resources>
