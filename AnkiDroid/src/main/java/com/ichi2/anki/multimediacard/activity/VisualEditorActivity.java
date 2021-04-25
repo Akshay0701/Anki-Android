@@ -62,7 +62,6 @@ import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionali
 
 import static com.ichi2.anki.NoteEditor.REQUEST_MULTIMEDIA_EDIT;
 
-//BUG: <hr/> is  less thick in the editor
 //NOTE: Remove formatting on "{{c1::" will cause a failure to detect the cloze deletion, this is the same as Anki.
 public class VisualEditorActivity extends AnkiActivity implements ColorPickerDialogListener {
 
