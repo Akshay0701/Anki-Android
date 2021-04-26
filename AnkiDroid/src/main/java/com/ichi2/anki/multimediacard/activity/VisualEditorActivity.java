@@ -68,6 +68,9 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
     private static final int COLOR_PICKER_FOREGROUND = 1;
     private static final int COLOR_PICKER_BACKGROUND = 2;
 
+    private static int COLOR_SELECTED_TEXT = Color.BLACK;
+    private static int COLOR_SELECTED_BACKGROUND = Color.YELLOW;
+
     public static final String EXTRA_FIELD = "visual.card.ed.extra.current.field";
     public static final String EXTRA_FIELD_INDEX = "visual.card.ed.extra.current.field.index";
     /** The Id of the current model (long) */
@@ -190,8 +193,8 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
         setupAndroidListener.apply(R.id.editor_button_insert_mathjax, this::insertMathJax, R.string.visual_editor_tooltip_mathjax);
         setupAndroidListener.apply(R.id.editor_button_add_image, this::openAdvancedViewerForAddImage, R.string.visual_editor_tooltip_add_image);
         setupAndroidListener.apply(R.id.editor_button_record_audio, this::openAdvancedViewerForRecordAudio, R.string.visual_editor_tooltip_record_audio);
-        setupAndroidListener.apply(R.id.editor_button_text_color, () -> this.openColorPicker(COLOR_PICKER_FOREGROUND, null), R.string.visual_editor_tooltip_text_color);
-        setupAndroidListener.apply(R.id.editor_button_background_color, () -> this.openColorPicker(COLOR_PICKER_BACKGROUND, Color.YELLOW), R.string.visual_editor_tooltip_background_color);
+        setupAndroidListener.apply(R.id.editor_button_text_color, () -> this.openColorPicker(COLOR_PICKER_FOREGROUND, COLOR_SELECTED_TEXT), R.string.visual_editor_tooltip_text_color);
+        setupAndroidListener.apply(R.id.editor_button_background_color, () -> this.openColorPicker(COLOR_PICKER_BACKGROUND, COLOR_SELECTED_BACKGROUND), R.string.visual_editor_tooltip_background_color);
     }
 
     private void insertMathJax() {
@@ -209,7 +212,7 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
         ColorPickerDialog.Builder d = ColorPickerDialog
                 .newBuilder()
                 .setDialogId(dialogId)
-                .setColorShape(ColorShape.SQUARE)
+                .setColorShape(ColorShape.CIRCLE)
                 .setAllowPresets(true)
                 .setShowColorShades(false);
 
@@ -609,9 +612,11 @@ public class VisualEditorActivity extends AnkiActivity implements ColorPickerDia
     public void onColorSelected(int dialogId, int color) {
         switch (dialogId) {
             case COLOR_PICKER_FOREGROUND:
+                COLOR_SELECTED_TEXT = color;
                 mWebView.setSelectedTextColor(color);
                 break;
             case COLOR_PICKER_BACKGROUND:
+                COLOR_SELECTED_BACKGROUND = color;
                 mWebView.setSelectedBackgroundColor(color);
                 break;
             default:
