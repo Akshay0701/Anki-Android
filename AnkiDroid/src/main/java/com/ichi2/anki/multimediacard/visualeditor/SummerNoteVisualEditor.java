@@ -75,6 +75,13 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
     }
 
     @Override
+    public void pasteHtml(String html) {
+        Timber.v("pasting: %s", html);
+        ExecEscaped safeString = ExecEscaped.fromString(html);
+        execUnsafe("pasteHTML('" + safeString.getEscapedValue() + "');");
+    }
+
+    @Override
     public void deleteImage(@NonNull String guid) {
         //noinspection ConstantConditions
         if (guid == null) {

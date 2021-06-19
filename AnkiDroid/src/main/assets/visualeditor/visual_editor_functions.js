@@ -56,6 +56,10 @@ function getGuid(target) {
     return guid;
 }
 
+var pasteHTML = function(data) {
+    $("#summernote").summernote("pasteHTML", data);
+};
+
 function escape(str) {
     return str.replace(/[^0-9a-z]/gi, "");
 }

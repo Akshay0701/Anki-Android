@@ -187,6 +187,8 @@ public abstract class VisualEditorWebView extends WebView {
 
     public abstract void deleteImage(@NonNull String guid);
 
+    public abstract void pasteHtml(String html);
+
     /** Executes a JavaScript function which has no arguments */
     public void execFunction(String functionName) {
         execUnsafe(functionName + "();");

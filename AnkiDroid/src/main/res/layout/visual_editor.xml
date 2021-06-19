@@ -122,6 +122,12 @@
                 />
 
             <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/editor_button_add_image"
+                style="@style/visual_editor_toolbar_button"
+                app:srcCompat="@drawable/ic_image_white"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/editor_button_view_html"
                 style="@style/visual_editor_toolbar_button"
                 app:srcCompat="@drawable/ic_code_black_24dp"

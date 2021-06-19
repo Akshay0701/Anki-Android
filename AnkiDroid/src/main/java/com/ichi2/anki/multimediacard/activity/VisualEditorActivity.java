@@ -10,6 +10,7 @@ import android.view.View;
 import com.ichi2.anki.AnkiActivity;
 import com.ichi2.anki.AnkiDroidApp;
 import com.ichi2.anki.R;
+import com.ichi2.anki.RegisterMediaForWebView;
 import com.ichi2.anki.cardviewer.CardAppearance;
 import com.ichi2.anki.UIUtils;
 import com.ichi2.anki.dialogs.DiscardChangesDialog;
@@ -42,6 +43,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import timber.log.Timber;
 
+import static com.ichi2.anki.NoteEditor.REQUEST_MULTIMEDIA_EDIT;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.*;
 
 //NOTE: Remove formatting on "{{c1::" will cause a failure to detect the cloze deletion, this is the same as Anki.
@@ -79,6 +81,10 @@ public class VisualEditorActivity extends AnkiActivity {
     private LargeObjectStorage mLargeObjectStorage = new LargeObjectStorage(this);
 
     private VisualEditorToolbar mVisualEditorToolbar;
+    private RegisterMediaForWebView mRegisterMediaForWebView;
+
+    //Unsure if this is needed, or whether getCol will block until onCollectionLoaded completes.
+    private boolean mHasLoadedCol;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +100,8 @@ public class VisualEditorActivity extends AnkiActivity {
 
         mVisualEditorToolbar = findViewById(R.id.editor_toolbar);
         mVisualEditorToolbar.setupEditorScrollbarButtons(this, mWebView);
+
+        mRegisterMediaForWebView = new RegisterMediaForWebView(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -272,6 +280,39 @@ public class VisualEditorActivity extends AnkiActivity {
         return mFields;
     }
 
+    public boolean isHasLoadedCol() {
+        return mHasLoadedCol;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        if (data == null) {
+            Timber.d("data was null");
+            return;
+        }
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+        if (data.getExtras() == null) {
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_MULTIMEDIA_EDIT:
+                IField field = (IField) data.getExtras().get(MultimediaEditFieldActivity.EXTRA_RESULT_FIELD);
+
+                if (field == null) {
+                    return;
+                }
+
+                if (!mRegisterMediaForWebView.registerMediaForWebView(field.getImagePath())) {
+                    return;
+                }
+           
+                this.mWebView.pasteHtml(field.getFormattedValue());
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     protected void onCollectionLoaded(Collection col) {
@@ -293,6 +334,7 @@ public class VisualEditorActivity extends AnkiActivity {
         }
 
         mWebView.injectCss(css);
+        mHasLoadedCol = true;
     }
 
 

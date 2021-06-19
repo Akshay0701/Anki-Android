@@ -2,15 +2,23 @@ package com.ichi2.anki.multimediacard.visualeditor;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.ichi2.anki.R;
+import com.ichi2.anki.UIUtils;
+import com.ichi2.anki.multimediacard.IMultimediaEditableNote;
+import com.ichi2.anki.multimediacard.activity.MultimediaEditFieldActivity;
 import com.ichi2.anki.multimediacard.activity.VisualEditorActivity;
+import com.ichi2.anki.multimediacard.fields.IField;
+import com.ichi2.anki.multimediacard.fields.ImageField;
+import com.ichi2.anki.servicelayer.NoteService;
 import com.ichi2.libanki.Note;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
@@ -18,6 +26,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.TooltipCompat;
 import timber.log.Timber;
 
+import static com.ichi2.anki.NoteEditor.REQUEST_MULTIMEDIA_EDIT;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_CENTER;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_JUSTIFY;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_LEFT;
@@ -87,7 +96,40 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         };
 
         setupAndroidListener.apply(R.id.editor_button_cloze, this::performCloze, R.string.visual_editor_tooltip_cloze);
+        setupAndroidListener.apply(R.id.editor_button_add_image, this::openAdvancedViewerForAddImage, R.string.visual_editor_tooltip_add_image);
 
+    }
+
+
+    private void openAdvancedViewerForAddImage() {
+        if (!checkCollectionHasLoaded(R.string.visual_editor_could_not_start_add_image)) {
+            return;
+        }
+
+        IField field = new ImageField();
+        openMultimediaEditor(field);
+    }
+
+    private void openMultimediaEditor(IField field) {
+        IMultimediaEditableNote note = NoteService.createEmptyNote(Objects.requireNonNull(mVisualEditorActivity.getCol().getModels().get(mVisualEditorActivity.getModelId())));
+        if (note != null) {
+            note.setField(0, field);
+            Intent editCard = new Intent(mVisualEditorActivity, MultimediaEditFieldActivity.class);
+            editCard.putExtra(MultimediaEditFieldActivity.EXTRA_FIELD_INDEX, 0);
+            editCard.putExtra(MultimediaEditFieldActivity.EXTRA_FIELD, field);
+            editCard.putExtra(MultimediaEditFieldActivity.EXTRA_WHOLE_NOTE, note);
+            mVisualEditorActivity.startActivityForResultWithoutAnimation(editCard, REQUEST_MULTIMEDIA_EDIT);
+        }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean checkCollectionHasLoaded(@StringRes int resId) {
+        if (mVisualEditorActivity.getModelId() == 0 || !mVisualEditorActivity.isHasLoadedCol()) {
+            //Haven't loaded yet.
+            UIUtils.showThemedToast(mVisualEditorActivity, mVisualEditorActivity.getString(resId), false);
+            return false;
+        }
+        return true;
     }
 
     private void performCloze() {
