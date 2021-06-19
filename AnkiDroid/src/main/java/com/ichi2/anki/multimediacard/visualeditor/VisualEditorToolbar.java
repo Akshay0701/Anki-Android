@@ -20,8 +20,11 @@ import timber.log.Timber;
 
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.BOLD;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.CLEAR_FORMATTING;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.HORIZONTAL_RULE;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ITALIC;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ORDERED_LIST;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.UNDERLINE;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.UNORDERED_LIST;
 
 // currently only used for adding new view to linearLayout of VisualEditorToolbar
 public class VisualEditorToolbar extends LinearLayoutCompat {
@@ -63,6 +66,9 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         setupAction.apply(R.id.editor_button_italic, ITALIC, R.string.visual_editor_tooltip_italic);
         setupAction.apply(R.id.editor_button_underline, UNDERLINE, R.string.visual_editor_tooltip_underline);
         setupAction.apply(R.id.editor_button_clear_formatting, CLEAR_FORMATTING, R.string.visual_editor_tooltip_clear_formatting);
+        setupAction.apply(R.id.editor_button_list_bullet, UNORDERED_LIST, R.string.visual_editor_tooltip_bullet_list);
+        setupAction.apply(R.id.editor_button_list_numbered, ORDERED_LIST, R.string.visual_editor_tooltip_numbered_list);
+        setupAction.apply(R.id.editor_button_horizontal_rule, HORIZONTAL_RULE, R.string.visual_editor_tooltip_horizontal_line);
 
         AndroidListenerSetup setupAndroidListener = (id, function, tooltipId) -> {
             View view = findViewById(id);
