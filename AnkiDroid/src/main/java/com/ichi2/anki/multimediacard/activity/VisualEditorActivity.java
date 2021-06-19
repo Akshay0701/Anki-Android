@@ -21,6 +21,7 @@ import com.ichi2.anki.reviewer.ReviewerCustomFonts;
 import com.ichi2.libanki.Collection;
 import com.ichi2.libanki.Models;
 import com.ichi2.libanki.Utils;
+import com.ichi2.utils.AssetReader;
 import com.ichi2.utils.JSONObject;
 import com.ichi2.utils.WebViewDebugging;
 
@@ -55,6 +56,7 @@ public class VisualEditorActivity extends AnkiActivity {
     private VisualEditorWebView mWebView;
     private long mModelId;
     private String[] mFields;
+    private AssetReader mAssetReader = new AssetReader(this);
 
     private VisualEditorToolbar mVisualEditorToolbar;
 
@@ -175,7 +177,13 @@ public class VisualEditorActivity extends AnkiActivity {
     protected void onCollectionLoaded(Collection col) {
         super.onCollectionLoaded(col);
         Timber.d("onCollectionLoaded");
-        initWebView(col);
+        try {
+            initWebView(col);
+        } catch (IOException e) {
+            Timber.e(e, "Failed to init web view");
+            failStartingVisualEditor();
+            return;
+        }
 
         JSONObject model = col.getModels().get(mModelId);
         String css = getModelCss(model);
@@ -209,52 +217,10 @@ public class VisualEditorActivity extends AnkiActivity {
     }
 
 
-    private void initWebView(Collection col) {
+    private void initWebView(Collection col) throws IOException{
         String mBaseUrl = Utils.getBaseUrl(col.getMedia().dir());
-        InputStream is = getInputStream();
-        try {
-            byte[] inputData = readFile(is);
-            String asString = new String(inputData, "UTF-8");
-            mWebView.init(asString, mBaseUrl);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    @NonNull
-    private InputStream getInputStream() {
-        InputStream is;
-        try {
-            is = getAssets().open("visualeditor/visual_editor.html");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return is;
-    }
-
-
-    private byte[] readFile(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream buffer = null;
-        try {
-            buffer = new ByteArrayOutputStream();
-
-            int nRead;
-            byte[] data = new byte[16384];
-
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-
-            return buffer.toByteArray();
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-            if (buffer != null) {
-                buffer.close();
-            }
-        }
+        String assetAsString = mAssetReader.loadAsUtf8String("visualeditor/visual_editor.html");
+        mWebView.init(assetAsString, mBaseUrl);
     }
 
     @Override
