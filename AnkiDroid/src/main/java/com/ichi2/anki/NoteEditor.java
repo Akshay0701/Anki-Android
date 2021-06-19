@@ -240,6 +240,9 @@ public class NoteEditor extends AnkiActivity implements
     private HashMap<Integer, Integer> mModelChangeCardMap;
     private ArrayList<Integer> mCustomViewIds = new ArrayList<>();
 
+    //TODO: This is only set on edit currently, not on add.
+    private Long mCurrentModelId = null;
+
     /* indicates if a new note is added or a card is edited */
     private boolean mAddNote;
     private boolean mAedictIntent;
@@ -2402,6 +2405,13 @@ public class NoteEditor extends AnkiActivity implements
         return String.format("{{c%s::%s}}", nextClozeIndex, selectedText);
     }
 
+
+    public long getModelId() {
+        if (mCurrentModelId != null) {
+            return mCurrentModelId;
+        }
+        return mEditorNote.model().getLong("id");
+    }
 
     private boolean hasClozeDeletions() {
         return getNextClozeIndex() > 1;

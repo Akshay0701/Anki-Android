@@ -19,7 +19,9 @@ import com.ichi2.anki.multimediacard.visualeditor.VisualEditorToolbar;
 import com.ichi2.anki.multimediacard.visualeditor.VisualEditorWebView;
 import com.ichi2.anki.reviewer.ReviewerCustomFonts;
 import com.ichi2.libanki.Collection;
+import com.ichi2.libanki.Models;
 import com.ichi2.libanki.Utils;
+import com.ichi2.utils.JSONObject;
 import com.ichi2.utils.WebViewDebugging;
 
 import java.io.ByteArrayOutputStream;
@@ -29,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Objects;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -142,20 +145,53 @@ public class VisualEditorActivity extends AnkiActivity {
         finishCancel();
     }
 
+
+    public String getCurrentText() {
+        return mCurrentText;
+    }
+
+
+    public void setCurrentText(String currentText) {
+        mCurrentText = currentText;
+    }
+
+
+    public int getIndex() {
+        return mIndex;
+    }
+
+
+    public long getModelId() {
+        return mModelId;
+    }
+
+
+    public String[] getFields() {
+        return mFields;
+    }
+
+
     @Override
     protected void onCollectionLoaded(Collection col) {
         super.onCollectionLoaded(col);
         Timber.d("onCollectionLoaded");
         initWebView(col);
 
-        String css = getModelCss(col);
+        JSONObject model = col.getModels().get(mModelId);
+        String css = getModelCss(model);
+        if (Models.isCloze(Objects.requireNonNull(model))) {
+            Timber.d("Cloze detected. Enabling Cloze button");
+            findViewById(R.id.editor_button_cloze).setVisibility(View.VISIBLE);
+        }
+
         mWebView.injectCss(css);
     }
 
 
-    private String getModelCss(Collection col) {
+
+    private String getModelCss(JSONObject model) {
         try {
-            String css = col.getModels().get(mModelId).getString("css");
+            String css = model.getString("css");
             return css.replace(".card", ".note-editable ");
         } catch (Exception e) {
             UIUtils.showThemedToast(this, "Failed to load template CSS", false);

@@ -1133,6 +1133,10 @@ public class Models {
         return _availClozeOrds(m, sflds, true);
     }
 
+    public static boolean isCloze(JSONObject model) {
+        return model.getInt("type") == Consts.MODEL_CLOZE;
+    }
+
     /**
      * Cache of getNamesOfFieldsContainingCloze
      * Computing hash of string is costly. However, hash is cashed in the string object, so this virtually ensure that

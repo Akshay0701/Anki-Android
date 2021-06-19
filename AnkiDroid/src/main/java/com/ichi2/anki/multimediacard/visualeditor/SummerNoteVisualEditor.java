@@ -30,6 +30,8 @@ package com.ichi2.anki.multimediacard.visualeditor;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import java.util.Locale;
+
 import androidx.annotation.NonNull;
 
 public class SummerNoteVisualEditor extends VisualEditorWebView {
@@ -69,6 +71,12 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
             case EDIT_SOURCE: return "editHtml";
             default: return null;
         }
+    }
+
+    @Override
+    public void insertCloze(int clozeId) {
+        ExecEscaped e = ExecEscaped.fromString(String.format(Locale.US, "cloze(%d)", clozeId));
+        exec(e);
     }
 
     @Override

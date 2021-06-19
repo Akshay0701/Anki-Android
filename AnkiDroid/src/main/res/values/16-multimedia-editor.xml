@@ -122,6 +122,7 @@
     <string name="visual_editor_tooltip_bold">Text Bold</string>
     <string name="visual_editor_tooltip_italic">Text Italic</string>
     <string name="visual_editor_tooltip_underline">Text Underline</string>
+    <string name="visual_editor_tooltip_cloze">Deletion Cloze</string>
     <string name="visual_editor_unable_to_open">Unable to open Visual Editor</string>
 
 </resources>

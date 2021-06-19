@@ -7,6 +7,10 @@ import android.view.View;
 
 import com.ichi2.anki.R;
 import com.ichi2.anki.multimediacard.activity.VisualEditorActivity;
+import com.ichi2.libanki.Note;
+
+import java.util.Arrays;
+import java.util.List;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
@@ -57,7 +61,27 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         setupAction.apply(R.id.editor_button_bold, BOLD, R.string.visual_editor_tooltip_bold);
         setupAction.apply(R.id.editor_button_italic, ITALIC, R.string.visual_editor_tooltip_italic);
         setupAction.apply(R.id.editor_button_underline, UNDERLINE, R.string.visual_editor_tooltip_underline);
+
+        AndroidListenerSetup setupAndroidListener = (id, function, tooltipId) -> {
+            View view = findViewById(id);
+            view.setOnClickListener(v -> function.run());
+            setTooltip(view, getResources().getString(tooltipId));
+        };
+
+        setupAndroidListener.apply(R.id.editor_button_cloze, this::performCloze, R.string.visual_editor_tooltip_cloze);
+
     }
+
+    private void performCloze() {
+        mWebView.insertCloze(getNextClozeId());
+    }
+
+    private int getNextClozeId() {
+        List<String> fields = Arrays.asList(mVisualEditorActivity.getFields());
+        fields.set(mVisualEditorActivity.getIndex(), mVisualEditorActivity.getCurrentText());
+        return Note.ClozeUtils.getNextClozeIndex(fields);
+    }
+
 
     private void setTooltip(View view, String tooltip) {
         TooltipCompat.setTooltipText(view, tooltip);
@@ -69,5 +93,10 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         void apply(@IdRes int buttonId, VisualEditorFunctionality function, @StringRes int tooltipText);
     }
 
+    /** A button which performs an Android Runnable */
+    @FunctionalInterface
+    protected interface AndroidListenerSetup {
+        void apply(@IdRes int buttonId, Runnable function, @StringRes int tooltipText);
+    }
 
 }
