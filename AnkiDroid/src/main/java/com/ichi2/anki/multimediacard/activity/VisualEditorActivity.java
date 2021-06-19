@@ -23,6 +23,8 @@ import com.ichi2.libanki.Models;
 import com.ichi2.libanki.Utils;
 import com.ichi2.utils.AssetReader;
 import com.ichi2.utils.JSONObject;
+import com.ichi2.utils.LargeObjectStorage;
+import com.ichi2.utils.LargeObjectStorage.StorageKey;
 import com.ichi2.utils.WebViewDebugging;
 
 import java.io.ByteArrayOutputStream;
@@ -44,6 +46,17 @@ import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionali
 //NOTE: Remove formatting on "{{c1::" will cause a failure to detect the cloze deletion, this is the same as Anki.
 public class VisualEditorActivity extends AnkiActivity {
 
+
+    public static final StorageKey<String> STORAGE_CURRENT_FIELD = new StorageKey<>(
+            "visual.card.ed.extra.current.field",
+            "visualed_current_field",
+            "bin");
+
+    public static final StorageKey<String[]> STORAGE_EXTRA_FIELDS = new StorageKey<>(
+            "visual.card.ed.extra.extra.fields",
+            "visualed_extra_fields",
+            "bin");
+
     public static final String EXTRA_FIELD = "visual.card.ed.extra.current.field";
     public static final String EXTRA_FIELD_INDEX = "visual.card.ed.extra.current.field.index";
     /** The Id of the current model (long) */
@@ -57,6 +70,8 @@ public class VisualEditorActivity extends AnkiActivity {
     private long mModelId;
     private String[] mFields;
     private AssetReader mAssetReader = new AssetReader(this);
+
+    private LargeObjectStorage mLargeObjectStorage = new LargeObjectStorage(this);
 
     private VisualEditorToolbar mVisualEditorToolbar;
 
@@ -107,10 +122,10 @@ public class VisualEditorActivity extends AnkiActivity {
         }
 
         //TODO: Save past data for later so we can see if we've changed.
-        mCurrentText = (String) extras.getSerializable(VisualEditorActivity.EXTRA_FIELD);
+        mCurrentText = mLargeObjectStorage.getSingleInstance(STORAGE_CURRENT_FIELD, extras);
         Integer index = (Integer) extras.getSerializable(VisualEditorActivity.EXTRA_FIELD_INDEX);
 
-        this.mFields = (String[]) extras.getSerializable(VisualEditorActivity.EXTRA_ALL_FIELDS);
+        this.mFields = mLargeObjectStorage.getSingleInstance (STORAGE_EXTRA_FIELDS, extras);
         Long modelId = (Long) extras.getSerializable(VisualEditorActivity.EXTRA_MODEL_ID);
 
         if (mCurrentText == null) {

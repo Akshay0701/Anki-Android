@@ -46,6 +46,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 
+import com.ichi2.utils.LargeObjectStorage;
+import com.ichi2.utils.LargeObjectStorage.StorageKey;
 import android.util.Pair;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -262,6 +264,8 @@ public class NoteEditor extends AnkiActivity implements
 
     // Use the same HTML if the same image is pasted multiple times.
     private HashMap<String, String> mPastedImageCache = new HashMap<>();
+
+    LargeObjectStorage mLargeObjectStorage = new LargeObjectStorage(this);
 
     private SaveNoteHandler saveNoteHandler() {
         return new SaveNoteHandler(this);
@@ -1569,12 +1573,16 @@ public class NoteEditor extends AnkiActivity implements
             try {
                 String value = mEditFields.get(index).getText().toString();
                 Intent i = new Intent(this, VisualEditorActivity.class);
-                i.putExtra(VisualEditorActivity.EXTRA_FIELD, value);
+                //Note: Intent.getExtras is a copy of the bundle.
+                Bundle b = new Bundle();
+                mLargeObjectStorage.storeSingleInstance(VisualEditorActivity.STORAGE_CURRENT_FIELD.asData(value), b);
+                mLargeObjectStorage.storeSingleInstance(VisualEditorActivity.STORAGE_EXTRA_FIELDS.asData(mEditorNote.getFields()), b);
+                i.replaceExtras(b);
+                i.putExtra(VisualEditorActivity.EXTRA_MODEL_ID, getModelId());
                 i.putExtra(VisualEditorActivity.EXTRA_FIELD_INDEX, index);
-                i.putExtra(VisualEditorActivity.EXTRA_ALL_FIELDS, mEditorNote.getFields());
-                i.putExtra(VisualEditorActivity.EXTRA_MODEL_ID, mEditorNote.model().getLong("id"));
                 startActivityForResultWithoutAnimation(i, REQUEST_VISUAL_EDIT);
             } catch (Exception e) {
+                Timber.w(e, getString(R.string.visual_editor_unable_to_open));
                 UIUtils.showThemedToast(this, getString(R.string.visual_editor_unable_to_open), false);
             }
         });
