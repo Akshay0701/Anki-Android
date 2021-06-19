@@ -24,6 +24,7 @@ import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionali
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_RIGHT;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.BOLD;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.CLEAR_FORMATTING;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.EDIT_SOURCE;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.HORIZONTAL_RULE;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ITALIC;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ORDERED_LIST;
@@ -77,6 +78,7 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         setupAction.apply(R.id.editor_button_align_center, ALIGN_CENTER, R.string.visual_editor_tooltip_horizontal_line);
         setupAction.apply(R.id.editor_button_align_right, ALIGN_RIGHT, R.string.visual_editor_tooltip_horizontal_line);
         setupAction.apply(R.id.editor_button_align_justify, ALIGN_JUSTIFY, R.string.visual_editor_tooltip_horizontal_line);
+        setupAction.apply(R.id.editor_button_view_html, EDIT_SOURCE, R.string.visual_editor_edit_html); //this is a toggle.
 
         AndroidListenerSetup setupAndroidListener = (id, function, tooltipId) -> {
             View view = findViewById(id);
