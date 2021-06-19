@@ -18,6 +18,10 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.TooltipCompat;
 import timber.log.Timber;
 
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_CENTER;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_JUSTIFY;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_LEFT;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ALIGN_RIGHT;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.BOLD;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.CLEAR_FORMATTING;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.HORIZONTAL_RULE;
@@ -69,6 +73,10 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         setupAction.apply(R.id.editor_button_list_bullet, UNORDERED_LIST, R.string.visual_editor_tooltip_bullet_list);
         setupAction.apply(R.id.editor_button_list_numbered, ORDERED_LIST, R.string.visual_editor_tooltip_numbered_list);
         setupAction.apply(R.id.editor_button_horizontal_rule, HORIZONTAL_RULE, R.string.visual_editor_tooltip_horizontal_line);
+        setupAction.apply(R.id.editor_button_align_left, ALIGN_LEFT, R.string.visual_editor_tooltip_horizontal_line);
+        setupAction.apply(R.id.editor_button_align_center, ALIGN_CENTER, R.string.visual_editor_tooltip_horizontal_line);
+        setupAction.apply(R.id.editor_button_align_right, ALIGN_RIGHT, R.string.visual_editor_tooltip_horizontal_line);
+        setupAction.apply(R.id.editor_button_align_justify, ALIGN_JUSTIFY, R.string.visual_editor_tooltip_horizontal_line);
 
         AndroidListenerSetup setupAndroidListener = (id, function, tooltipId) -> {
             View view = findViewById(id);
