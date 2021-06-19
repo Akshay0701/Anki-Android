@@ -56,6 +56,8 @@ public abstract class VisualEditorWebView extends WebView {
     private OnTextChangeListener mOnTextChangeListener;
     private boolean mIsReady;
 
+    private SelectionChangeListener mSelectionChangedListener;
+
     public VisualEditorWebView(Context context) {
         super(context);
     }
@@ -114,6 +116,38 @@ public abstract class VisualEditorWebView extends WebView {
         this.mOnTextChangeListener = onTextChangeListener;
     }
 
+    /** SELECTION */
+
+    @JavascriptInterface
+    public void onImageSelection(String guid, String src) {
+        Timber.d("onImageSelection %s", src);
+        onSelectionChanged(SelectionType.imageFromSrc(guid, src));
+    }
+
+    @JavascriptInterface
+    public void onRegularSelection() {
+        onSelectionChanged(SelectionType.REGULAR);
+    }
+
+    protected void onSelectionChanged(SelectionType selection) {
+        SelectionChangeListener listener = getSelectionChangedListener();
+        if (listener == null) {
+            return;
+        }
+        listener.onSelectionChanged(selection);
+    }
+
+    public void setSelectionChangedListener(SelectionChangeListener listener) {
+        this.mSelectionChangedListener = listener;
+    }
+
+    public SelectionChangeListener getSelectionChangedListener() {
+        return this.mSelectionChangedListener;
+    }
+
+    /** END SELECTION */
+
+
 
     protected WebViewClient getDefaultWebViewClient() {
         return new VisualEditorWebViewClient();
@@ -150,6 +184,8 @@ public abstract class VisualEditorWebView extends WebView {
     }
 
     public abstract void setHtml(@NonNull String html);
+
+    public abstract void deleteImage(@NonNull String guid);
 
     /** Executes a JavaScript function which has no arguments */
     public void execFunction(String functionName) {
@@ -269,6 +305,37 @@ public abstract class VisualEditorWebView extends WebView {
             return true;
         }
     }
+
+    @FunctionalInterface
+    public interface SelectionChangeListener {
+        void onSelectionChanged(SelectionType selection);
+    }
+
+    public enum SelectionType {
+        REGULAR,
+        IMAGE;
+
+        private String mData;
+        private String mGuid;
+
+        public static SelectionType imageFromSrc(String guid, String src) {
+            SelectionType type = SelectionType.IMAGE;
+            type.mData = src;
+            type.mGuid = guid;
+            return type;
+        }
+
+
+        public String getImageSrc() {
+            return mData;
+        }
+
+
+        public String getGuid() {
+            return mGuid;
+        }
+    }
+
 
     public interface OnTextChangeListener {
         void onTextChanged(String content);
