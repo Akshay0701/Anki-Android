@@ -49,6 +49,7 @@ public class FieldEditLine extends FrameLayout {
     private TextView mLabel;
     private ImageButton mMediaButton;
     private ImageButton mExpandButton;
+    private ImageButton mVisualEditorButton;
 
     private String mName;
     private ExpansionState mExpansionState;
@@ -87,6 +88,7 @@ public class FieldEditLine extends FrameLayout {
         this.mMediaButton = findViewById(R.id.id_media_button);
         ConstraintLayout mConstraintLayout = findViewById(R.id.constraint_layout);
         this.mExpandButton = findViewById(R.id.id_expand_button);
+        this.mVisualEditorButton = findViewById(R.id.id_visual_editor);
         // 7433 -
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             mEditText.setId(ViewCompat.generateViewId());
@@ -94,9 +96,11 @@ public class FieldEditLine extends FrameLayout {
             mExpandButton.setId(ViewCompat.generateViewId());
             mEditText.setNextFocusForwardId(mMediaButton.getId());
             mMediaButton.setNextFocusForwardId(mExpandButton.getId());
+            mVisualEditorButton.setId(ViewCompat.generateViewId());
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(mConstraintLayout);
             constraintSet.connect(mMediaButton.getId(), ConstraintSet.END, mExpandButton.getId(), ConstraintSet.START);
+            constraintSet.connect(mVisualEditorButton.getId(), ConstraintSet.END, mMediaButton.getId(), ConstraintSet.START);
             constraintSet.applyTo(mConstraintLayout);
         }
 
@@ -171,6 +175,11 @@ public class FieldEditLine extends FrameLayout {
         }
     }
 
+    public ImageButton getVisualEditorButton() {
+        return mVisualEditorButton;
+    }
+
+
     public void setContent(String content, boolean replaceNewline) {
         mEditText.setContent(content, replaceNewline);
     }
@@ -228,6 +237,7 @@ public class FieldEditLine extends FrameLayout {
         savedState.mEditTextId = getEditText().getId();
         savedState.mMediaButtonId = getMediaButton().getId();
         savedState.mExpandButtonId = mExpandButton.getId();
+        savedState.mVisualEditorId = mVisualEditorButton.getId();
 
         for (int i = 0; i < getChildCount(); i++) {
             getChildAt(i).saveHierarchyState(savedState.mChildrenStates);
@@ -279,6 +289,7 @@ public class FieldEditLine extends FrameLayout {
         private int mEditTextId;
         private int mMediaButtonId;
         public int mExpandButtonId;
+        public int mVisualEditorId;
         private ExpansionState mExpansionState;
 
         SavedState(Parcelable superState) {
@@ -292,6 +303,7 @@ public class FieldEditLine extends FrameLayout {
             out.writeInt(mEditTextId);
             out.writeInt(mMediaButtonId);
             out.writeInt(mExpandButtonId);
+            out.writeInt(mVisualEditorId);
             out.writeSerializable(mExpansionState);
         }
 
@@ -321,6 +333,7 @@ public class FieldEditLine extends FrameLayout {
             this.mEditTextId = in.readInt();
             this.mMediaButtonId = in.readInt();
             this.mExpandButtonId = in.readInt();
+            this.mVisualEditorId = in.readInt();
             this.mExpansionState = (ExpansionState) in.readSerializable();
         }
     }

@@ -120,4 +120,5 @@
     <!--Custom Tabs colors-->
     <attr name="customTabToolbarColor" format="color"/>
     <attr name="customTabNavBarColor" format="color"/>
+    <attr name="visualEditorImage" format="integer"/>
 </resources>
