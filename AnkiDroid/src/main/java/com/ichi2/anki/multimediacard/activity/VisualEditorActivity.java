@@ -12,6 +12,7 @@ import com.ichi2.anki.AnkiDroidApp;
 import com.ichi2.anki.R;
 import com.ichi2.anki.cardviewer.CardAppearance;
 import com.ichi2.anki.UIUtils;
+import com.ichi2.anki.dialogs.DiscardChangesDialog;
 import com.ichi2.anki.multimediacard.fields.IField;
 import com.ichi2.anki.multimediacard.fields.TextField;
 import com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality;
@@ -95,6 +96,41 @@ public class VisualEditorActivity extends AnkiActivity {
         startLoadingCollection();
     }
 
+    private void saveChangesOrExit() {
+        if (hasChanges()) {
+            DiscardChangesDialog.getDefault(this)
+                    .onPositive((dialog, which) -> this.finishCancel())
+                    .build().show();
+        } else {
+            this.finishCancel();
+        }
+    }
+
+
+    private boolean hasChanges() {
+        try {
+            return !mCurrentText.equals(mFields[mIndex]);
+        } catch (Exception e) {
+            Timber.w(e, "Failed to determine if editor has changes. Assuming true.");
+            //Currently only used for
+            return true;
+        }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        saveChangesOrExit();
+        //explicitly do not call super.onBackPressed()
+    }
+
+    @Override
+    protected boolean onActionBarBackPressed() {
+        saveChangesOrExit();
+        return true;
+    }
+
+
     private void setupWebView(VisualEditorWebView webView) {
         WebViewDebugging.initializeDebugging(AnkiDroidApp.getSharedPrefs(this));
 
@@ -120,7 +156,6 @@ public class VisualEditorActivity extends AnkiActivity {
             return false;
         }
 
-        //TODO: Save past data for later so we can see if we've changed.
         if (mCurrentText == null) {
             mCurrentText = mLargeObjectStorage.getSingleInstance(STORAGE_CURRENT_FIELD, extras);
         }

@@ -140,12 +140,15 @@ public class AnkiActivity extends AppCompatActivity implements SimpleMessageDial
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Timber.i("Home button pressed");
-            finishWithoutAnimation();
-            return true;
+            return onActionBarBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    protected boolean onActionBarBackPressed() {
+        finishWithoutAnimation();
+        return true;
+    }
 
     // called when the CollectionLoader finishes... usually will be over-ridden
     protected void onCollectionLoaded(Collection col) {
