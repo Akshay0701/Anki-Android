@@ -117,4 +117,10 @@
     <string name="select_image_failed">"Select image failed, Please retry"</string>
     <string name="activity_result_unexpected">App returned an unexpected value. You may need to use a different app</string>
 
+    <!-- Visual Editor -->
+    <string name="title_activity_visual_editor">Visual Editor</string>
+    <string name="visual_editor_tooltip_bold">Text Bold</string>
+    <string name="visual_editor_tooltip_italic">Text Italic</string>
+    <string name="visual_editor_tooltip_underline">Text Underline</string>
+
 </resources>
