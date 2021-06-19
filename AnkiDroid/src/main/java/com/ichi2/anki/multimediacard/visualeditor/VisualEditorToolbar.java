@@ -19,6 +19,7 @@ import androidx.appcompat.widget.TooltipCompat;
 import timber.log.Timber;
 
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.BOLD;
+import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.CLEAR_FORMATTING;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.ITALIC;
 import static com.ichi2.anki.multimediacard.visualeditor.VisualEditorFunctionality.UNDERLINE;
 
@@ -61,6 +62,7 @@ public class VisualEditorToolbar extends LinearLayoutCompat {
         setupAction.apply(R.id.editor_button_bold, BOLD, R.string.visual_editor_tooltip_bold);
         setupAction.apply(R.id.editor_button_italic, ITALIC, R.string.visual_editor_tooltip_italic);
         setupAction.apply(R.id.editor_button_underline, UNDERLINE, R.string.visual_editor_tooltip_underline);
+        setupAction.apply(R.id.editor_button_clear_formatting, CLEAR_FORMATTING, R.string.visual_editor_tooltip_clear_formatting);
 
         AndroidListenerSetup setupAndroidListener = (id, function, tooltipId) -> {
             View view = findViewById(id);
