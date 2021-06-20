@@ -27,8 +27,13 @@ SOFTWARE.
 
 package com.ichi2.anki.multimediacard.visualeditor;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.webkit.JavascriptInterface;
+
+import com.ichi2.anki.RegisterMediaForWebView;
 
 import java.util.Locale;
 
@@ -36,23 +41,29 @@ import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 public class SummerNoteVisualEditor extends VisualEditorWebView {
+
+    private final RegisterMediaForWebView mRegisterMediaForWebView;
     public SummerNoteVisualEditor(Context context) {
         super(context);
+        mRegisterMediaForWebView = new RegisterMediaForWebView(context);
     }
 
 
     public SummerNoteVisualEditor(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mRegisterMediaForWebView = new RegisterMediaForWebView(context);
     }
 
 
     public SummerNoteVisualEditor(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mRegisterMediaForWebView = new RegisterMediaForWebView(context);
     }
 
 
     public SummerNoteVisualEditor(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        mRegisterMediaForWebView = new RegisterMediaForWebView(context);
     }
 
     @Override
@@ -86,7 +97,7 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
 
     @Override
     protected void onPostInit(String utf8Content, String baseUrl) {
-        addJavascriptInterface(this, "RTextEditorView");
+        addJavascriptInterface(this, "VisualEditor");
         loadDataWithBaseURL(baseUrl + "__visual_editor__.html\"", utf8Content, "text/html; charset=utf-8", "UTF-8", null);
     }
 
@@ -102,6 +113,25 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
         String safeCommand = String.format("deleteImage('%s')", safeString.getEscapedValue());
         execUnsafe(safeCommand);
     }
+
+    @JavascriptInterface
+    public void pasteImage() {
+        post(() -> {
+            ClipboardManager clipboardManager = (ClipboardManager)getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData pData = clipboardManager.getPrimaryClip();
+            ClipData.Item item = pData.getItemAt(0);
+            if (item.getUri() != null) {
+                String image;
+                try {
+                    image = mRegisterMediaForWebView.registerMediaWithUri(item.getUri());
+                    pasteHtml(image);
+                } catch (NullPointerException e) {
+                    Timber.w(e);
+                }
+            }
+        });
+    }
+
 
     // used ` instead of "/' double or single quotes. They can't be used to declare multiline string.
     @Override
