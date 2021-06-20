@@ -147,6 +147,10 @@ public class SummerNoteVisualEditor extends VisualEditorWebView {
         exec(e);
     }
 
+    @Override
+    public void insertCustomTag(String customPrefix, String customSuffix) {
+        execUnsafe("insertCustomTag('" + customPrefix + "','" + customSuffix + "');");
+    }
 
     @Override
     public void setHtml(@NonNull String html) {

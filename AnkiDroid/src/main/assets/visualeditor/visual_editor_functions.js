@@ -36,6 +36,11 @@ var cloze = function(clozeId) {
     insertAtPoint(endPoint, clozeSuffix, clozePrefix.length);
 };
 
+var insertCustomTag = function(customPrefix, customSuffix) {
+    var selected = $("#summernote").summernote("createRange");
+    document.execCommand("insertHTML", true, customPrefix + selected.toString() + customSuffix);
+}
+
 var pasteHTML = function(data) {
     $("#summernote").summernote("pasteHTML", data);
 };
