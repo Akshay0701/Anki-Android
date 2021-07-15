@@ -54,7 +54,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -84,6 +83,7 @@ import com.ichi2.libanki.Utils;
 import com.ichi2.libanki.Deck;
 import com.ichi2.themes.Themes;
 import com.ichi2.ui.CardBrowserSearchView;
+import com.ichi2.ui.FixedTextView;
 import com.ichi2.upgrade.Upgrade;
 import com.ichi2.utils.FunctionalInterfaces;
 import com.ichi2.utils.LanguageUtil;
@@ -106,6 +106,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 import static com.ichi2.anki.CardBrowser.Column.*;
@@ -157,9 +161,9 @@ public class CardBrowser extends NavigationDrawerActivity implements
     private final CardCollection<CardCache> mCards = new CardCollection<>();
     public DeckSpinnerSelection mDeckSpinnerSelection;
     @VisibleForTesting
-    public ListView mCardsListView;
+    public RecyclerView mCardsListView;
     private CardBrowserSearchView mSearchView;
-    private MultiColumnListAdapter mCardsAdapter;
+    private MultiColumnRecyclerListAdapter mCardsAdapter;
     private String mSearchTerms;
     private String mRestrictOnDeck;
     private int mCurrentFlag;
@@ -690,62 +694,21 @@ public class CardBrowser extends NavigationDrawerActivity implements
         String sflCustomFont = preferences.getString("browserEditorFont", "");
         Column[] columnsContent = {COLUMN1_KEYS[mColumn1Index], COLUMN2_KEYS[mColumn2Index]};
         // make a new list adapter mapping the data in mCards to column1 and column2 of R.layout.card_item_browser
-        mCardsAdapter = new MultiColumnListAdapter(
+        mCardsAdapter = new MultiColumnRecyclerListAdapter(
                 this,
                 R.layout.card_item_browser,
                 columnsContent,
                 new int[] {R.id.card_sfld, R.id.card_column2},
                 sflRelativeFontSize,
                 sflCustomFont);
+
         // link the adapter to the main mCardsListView
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(this, R.drawable.divider));
+        mCardsListView.addItemDecoration(itemDecorator);
+        mCardsListView.setVerticalScrollBarEnabled(true);
+        mCardsListView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mCardsListView.setAdapter(mCardsAdapter);
-        // make the items (e.g. question & answer) render dynamically when scrolling
-        mCardsListView.setOnScrollListener(new RenderOnScroll());
-        // set the spinner index
-        cardsColumn1Spinner.setSelection(mColumn1Index);
-        cardsColumn2Spinner.setSelection(mColumn2Index);
-
-
-        mCardsListView.setOnItemClickListener((parent, view, position, id) -> {
-            if (mInMultiSelectMode) {
-                // click on whole cell triggers select
-                CheckBox cb = view.findViewById(R.id.card_checkbox);
-                cb.toggle();
-                onCheck(position, view);
-            } else {
-                // load up the card selected on the list
-                long clickedCardId = getCards().get(position).getId();
-                saveScrollingState(position);
-                openNoteEditorForCard(clickedCardId);
-            }
-        });
-
-        mCardsListView.setOnItemLongClickListener((adapterView, view, position, id) -> {
-            if (mInMultiSelectMode) {
-                boolean hasChanged = false;
-                for (int i = Math.min(mLastSelectedPosition, position); i <= Math.max(mLastSelectedPosition, position); i++) {
-                    CardCache card = (CardCache) mCardsListView.getItemAtPosition(i);
-
-                    // Add to the set of checked cards
-                    hasChanged |= mCheckedCards.add(card);
-                }
-                if (hasChanged) {
-                    onSelectionChanged();
-                }
-            } else {
-                mLastSelectedPosition = position;
-                saveScrollingState(position);
-                loadMultiSelectMode();
-
-                // click on whole cell triggers select
-                CheckBox cb = view.findViewById(R.id.card_checkbox);
-                cb.toggle();
-                onCheck(position, view);
-                recenterListView(view);
-                mCardsAdapter.notifyDataSetChanged();
-            }
-            return true;
-        });
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -2007,12 +1970,12 @@ public class CardBrowser extends NavigationDrawerActivity implements
     }
 
     private void autoScrollTo(int newPosition) {
-        mCardsListView.setSelectionFromTop(newPosition, mOldCardTopOffset);
+        mCardsListView.getLayoutManager().scrollToPosition(newPosition);
         mPostAutoScroll = true;
     }
 
     private int calculateTopOffset(int cardPosition) {
-        int firstVisiblePosition = mCardsListView.getFirstVisiblePosition();
+        int firstVisiblePosition = mCardsListView.getAdapter().getItemCount();
         View v = mCardsListView.getChildAt(cardPosition - firstVisiblePosition);
         return (v == null) ? 0 : v.getTop();
     }
@@ -2253,76 +2216,109 @@ public class CardBrowser extends NavigationDrawerActivity implements
     }
 
 
-    private final class MultiColumnListAdapter extends BaseAdapter {
+    /**
+     * there is problem with fast scroll in recyclerview:
+     * when number of list is big then scroll bar of recyclerview will become more and more tiny
+     * (this is in built problem of recyclerview) https://issuetracker.google.com/issues/64729576
+     * todo getFirstVisiblePosition and calculateTopOffset and other bugs
+     */
+    public class MultiColumnRecyclerListAdapter extends RecyclerView.Adapter<MultiColumnRecyclerListAdapter.MyHolder>{
+
+        private Context mContext;
         private final int mResource;
         private Column[] mFromKeys;
         private final int[] mToIds;
         private float mOriginalTextSize = -1.0f;
         private final int mFontSizeScalePcent;
         private Typeface mCustomTypeface = null;
-        private final LayoutInflater mInflater;
 
-        public MultiColumnListAdapter(Context context, int resource, Column[] from, int[] to,
-                                      int fontSizeScalePcent, String customFont) {
+        public MultiColumnRecyclerListAdapter(Context context, int resource, Column[] from, int[] to,
+                                              int fontSizeScalePcent, String customFont) {
             mResource = resource;
             mFromKeys = from;
             mToIds = to;
+            mContext = context;
             mFontSizeScalePcent = fontSizeScalePcent;
             if (!"".equals(customFont)) {
                 mCustomTypeface = AnkiFont.getTypeface(context, customFont);
             }
-            mInflater = LayoutInflater.from(context);
+        }
+
+        @NonNull
+        @Override
+        public MultiColumnRecyclerListAdapter.MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view= LayoutInflater.from(mContext).inflate(mResource, parent, false);
+            return new MyHolder(view);
         }
 
 
-        public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public void onBindViewHolder(@NonNull MultiColumnRecyclerListAdapter.MyHolder holder, int position) {
             // Get the main container view if it doesn't already exist, and call bindView
-            View v;
-            if (convertView == null) {
-                v = mInflater.inflate(mResource, parent, false);
-                final int count = mToIds.length;
-                final View[] columns = new View[count];
-                for (int i = 0; i < count; i++) {
-                    columns[i] = v.findViewById(mToIds[i]);
-                }
-                v.setTag(columns);
-            } else {
-                v = convertView;
-            }
-            bindView(position, v);
-            return v;
-        }
-
-
-        private void bindView(final int position, final View v) {
-            // Draw the content in the columns
-            View[] columns = (View[]) v.getTag();
-            final CardCache card = getCards().get(position);
+            final CardBrowser.CardCache currentCard = getCards().get(position);
             for (int i = 0; i < mToIds.length; i++) {
-                TextView col = (TextView) columns[i];
+                TextView col = holder.itemView.findViewById(mToIds[i]);
                 // set font for column
                 setFont(col);
                 // set text for column
-                col.setText(card.getColumnHeaderText(mFromKeys[i]));
+                col.setText(currentCard.getColumnHeaderText(mFromKeys[i]));
             }
+
             // set card's background color
-            final int backgroundColor = Themes.getColorFromAttr(CardBrowser.this, card.getColor());
-            v.setBackgroundColor(backgroundColor);
-            // setup checkbox to change color in multi-select mode
-            final CheckBox checkBox = v.findViewById(R.id.card_checkbox);
-            // if in multi-select mode, be sure to show the checkboxes
+            final int backgroundColor = Themes.getColorFromAttr(CardBrowser.this, currentCard.getColor());
+            holder.itemView.setBackgroundColor(backgroundColor);
+
             if(mInMultiSelectMode) {
-                checkBox.setVisibility(View.VISIBLE);
-                checkBox.setChecked(mCheckedCards.contains(card));
+                holder.mCheckBox.setVisibility(View.VISIBLE);
+                holder.mCheckBox.setChecked(mCheckedCards.contains(currentCard));
                 // this prevents checkboxes from showing an animation from selected -> unselected when
                 // checkbox was selected, then selection mode was ended and now restarted
-                checkBox.jumpDrawablesToCurrentState();
+                holder.mCheckBox.jumpDrawablesToCurrentState();
             } else {
-                checkBox.setChecked(false);
-                checkBox.setVisibility(View.GONE);
+                holder.mCheckBox.setChecked(false);
+                holder.mCheckBox.setVisibility(View.GONE);
             }
-            // change bg color on check changed
-            checkBox.setOnClickListener(view -> onCheck(position, v));
+            holder.mCheckBox.setOnClickListener(view -> onCheck(position, view));
+
+            holder.itemView.setOnClickListener((view) -> {
+                if (mInMultiSelectMode) {
+                    // click on whole cell triggers select
+                    holder.mCheckBox.toggle();
+                    onCheck(position, view);
+                } else {
+                    // load up the card selected on the list
+                    long clickedCardId = getCards().get(position).getId();
+                    saveScrollingState(position);
+                    openNoteEditorForCard(clickedCardId);
+                }
+            });
+
+            holder.itemView.setOnLongClickListener((view) -> {
+                if (mInMultiSelectMode) {
+                    boolean hasChanged = false;
+                    for (int i = Math.min(mLastSelectedPosition, position); i <= Math.max(mLastSelectedPosition, position); i++) {
+                        CardCache card = (CardCache) getCards().get(i);
+                        // Add to the set of checked cards
+                        hasChanged |= mCheckedCards.add(card);
+                    }
+                    if (hasChanged) {
+                        onSelectionChanged();
+                    }
+                } else {
+                    mLastSelectedPosition = position;
+                    saveScrollingState(position);
+                    loadMultiSelectMode();
+
+                    // click on whole cell triggers select
+                    holder.mCheckBox.setVisibility(View.VISIBLE);
+                    holder.mCheckBox.toggle();
+                    onCheck(position, view);
+                    recenterListView(view);
+                    mCardsAdapter.notifyDataSetChanged();
+                }
+                return true;
+            });
+
         }
 
         private void setFont(TextView v) {
@@ -2342,36 +2338,38 @@ public class CardBrowser extends NavigationDrawerActivity implements
             }
         }
 
-        public void setFromMapping(Column[] from) {
+        public void setFromMapping(CardBrowser.Column[] from) {
             mFromKeys = from;
             notifyDataSetChanged();
         }
 
 
-        public Column[] getFromMapping() {
+        public CardBrowser.Column[] getFromMapping() {
             return mFromKeys;
         }
 
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return getCardCount();
         }
-
-
-        @Override
-        public CardCache getItem(int position) {
-            return getCards().get(position);
-        }
-
 
         @Override
         public long getItemId(int position) {
             return position;
         }
 
+        class MyHolder extends RecyclerView.ViewHolder {
+            CheckBox mCheckBox;
+            FixedTextView mCardColumn1,mCardColumn2;
+            public MyHolder(@NonNull View itemView) {
+                super(itemView);
+                mCardColumn1 = itemView.findViewById(R.id.card_sfld);
+                mCardColumn2 = itemView.findViewById(R.id.card_column2);
+                mCheckBox = itemView.findViewById(R.id.card_checkbox);
+            }
+        }
     }
-
 
     private void onCheck(int position, View cell) {
         CheckBox checkBox = cell.findViewById(R.id.card_checkbox);
@@ -2745,14 +2743,14 @@ public class CardBrowser extends NavigationDrawerActivity implements
      * adjust so that the vertical position of the given view is maintained
      */
     private void recenterListView(@NonNull View view) {
-        final int position = mCardsListView.getPositionForView(view);
+        final int position = mCardsListView.getChildAdapterPosition(view);
         // Get the current vertical position of the top of the selected view
         final int top = view.getTop();
         final Handler handler = new Handler();
         // Post to event queue with some delay to give time for the UI to update the layout
         handler.postDelayed(() -> {
             // Scroll to the same vertical position before the layout was changed
-            mCardsListView.setSelectionFromTop(position, top);
+            mCardsListView.getLayoutManager().scrollToPosition(position);
         }, 10);
     }
 
@@ -2782,7 +2780,7 @@ public class CardBrowser extends NavigationDrawerActivity implements
         mCheckedCards.clear();
         mInMultiSelectMode = false;
         // If view which was originally selected when entering multi-select is visible then maintain its position
-        View view = mCardsListView.getChildAt(mLastSelectedPosition - mCardsListView.getFirstVisiblePosition());
+        View view = mCardsListView.getChildAt(mLastSelectedPosition - mCardsListView.getAdapter().getItemCount());
         if (view != null) {
             recenterListView(view);
         }

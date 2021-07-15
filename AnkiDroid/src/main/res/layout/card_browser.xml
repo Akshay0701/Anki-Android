@@ -35,12 +35,13 @@
                 app:popupTheme="@style/ActionBar.Popup" />
         </LinearLayout>
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/card_browser_list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="?android:attr/colorBackground"
             android:divider="?attr/cardBrowserDivider"
+            android:scrollbars="vertical"
             android:overScrollFooter="@color/transparent"
             android:dividerHeight="0.5dp"
             android:drawSelectorOnTop="true"
