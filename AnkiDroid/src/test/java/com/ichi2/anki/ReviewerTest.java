@@ -83,6 +83,7 @@ public class ReviewerTest extends RobolectricTest {
     }
 
     @Test
+    @RunInBackground
     public void verifyNormalStartup() {
         try (ActivityScenario<Reviewer> scenario = ActivityScenario.launch(Reviewer.class)) {
             scenario.onActivity(reviewer -> assertNotNull("Collection should be non-null", reviewer.getCol()));
@@ -90,6 +91,7 @@ public class ReviewerTest extends RobolectricTest {
     }
 
     @Test
+    @RunInBackground
     public void exitCommandWorksAfterControlsAreBlocked() {
         ensureCollectionLoadIsSynchronous();
         try (ActivityScenario<Reviewer> scenario = ActivityScenario.launch(Reviewer.class)) {
@@ -346,7 +348,7 @@ public class ReviewerTest extends RobolectricTest {
         cloneTemplate(models, m);
         cloneTemplate(models, m);
 
-        Note newNote = getCol().newNote();
+        @NonNull Note newNote = getCol().newNote();
         newNote.setField(0, "Hello");
         assertThat(newNote.model().get("name"), is("Three"));
 

@@ -15,15 +15,25 @@
  ****************************************************************************************/
 package com.ichi2.anki;
 
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.drakeet.drawer.FullDraggableContainer;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -32,12 +42,16 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.ichi2.anki.dialogs.HelpDialog;
 import com.ichi2.themes.Themes;
+
+import java.util.Arrays;
+
 import androidx.drawerlayout.widget.ClosableDrawerLayout;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -64,11 +78,43 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
     public static final int REQUEST_BROWSE_CARDS = 101;
     public static final int REQUEST_STATISTICS = 102;
     private static final String NIGHT_MODE_PREFERENCE = "invertedColors";
+    public static final String FULL_SCREEN_NAVIGATION_DRAWER = "gestureFullScreenNavigationDrawer";
 
     /**
      * runnable that will be executed after the drawer has been closed.
      */
     private Runnable mPendingRunnable;
+
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        SharedPreferences preferences = AnkiDroidApp.getSharedPrefs(getBaseContext());
+
+        // Using ClosableDrawerLayout as a parent view.
+        ClosableDrawerLayout closableDrawerLayout = (ClosableDrawerLayout) LayoutInflater.from(this).inflate(getNavigationDrawerLayout(), null, false);
+        // Get CoordinatorLayout using resource ID
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) LayoutInflater.from(this).inflate(layoutResID, closableDrawerLayout, false);
+        if (preferences.getBoolean(FULL_SCREEN_NAVIGATION_DRAWER, false)) {
+            // If full screen navigation drawer is needed, then add FullDraggableContainer as a child view of closableDrawerLayout.
+            // Then add coordinatorLayout as a child view of fullDraggableContainer.
+            FullDraggableContainer fullDraggableContainer = new FullDraggableContainer(this);
+            fullDraggableContainer.addView(coordinatorLayout);
+            closableDrawerLayout.addView(fullDraggableContainer, 0);
+        } else {
+            // If full screen navigation drawer is not needed, then directly add coordinatorLayout as the child view.
+            closableDrawerLayout.addView(coordinatorLayout, 0);
+        }
+
+        setContentView(closableDrawerLayout);
+    }
+
+    private @LayoutRes int getNavigationDrawerLayout() {
+        return fitsSystemWindows() ? R.layout.navigation_drawer_layout : R.layout.navigation_drawer_layout_fullscreen;
+    }
+
+    /** Whether android:fitsSystemWindows="true" should be applied to the navigation drawer */
+    protected boolean fitsSystemWindows() {
+        return true;
+    }
 
     // Navigation drawer initialisation
     protected void initNavigationDrawer(View mainView) {
@@ -131,6 +177,56 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
         }
         mDrawerToggle.setDrawerSlideAnimationEnabled(animationEnabled());
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        enablePostShortcut(this);
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N_MR1)
+    public static void enablePostShortcut(@NonNull Context context) {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            return;
+        }
+        
+        ShortcutManager shortcutManager = context.getSystemService(ShortcutManager.class);
+
+        // Review Cards Shortcut
+        Intent intentReviewCards = new Intent(context, Reviewer.class);
+        intentReviewCards.setAction(Intent.ACTION_VIEW);
+        intentReviewCards.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        ShortcutInfo reviewCardsShortcut = new ShortcutInfo.Builder(context, "reviewCardsShortcutId")
+                .setShortLabel(context.getString(R.string.card_info_reviews))
+                .setLongLabel(context.getString(R.string.card_info_reviews))
+                .setIcon(Icon.createWithResource(context, R.drawable.ankidroid_logo))
+                .setIntent(intentReviewCards)
+                .build();
+
+        // Add Note Shortcut
+        Intent intentAddNote = new Intent(context, NoteEditor.class);
+        intentAddNote.setAction(Intent.ACTION_VIEW);
+        intentAddNote.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intentAddNote.putExtra(NoteEditor.EXTRA_CALLER, NoteEditor.CALLER_DECKPICKER);
+        ShortcutInfo NoteEditorShortcut = new ShortcutInfo.Builder(context, "noteEditorShortcutId")
+                .setShortLabel(context.getString(R.string.menu_add_note))
+                .setLongLabel(context.getString(R.string.menu_add_note))
+                .setIcon(Icon.createWithResource(context, R.drawable.ankidroid_logo))
+                .setIntent(intentAddNote)
+                .build();
+
+        // CardBrowser Shortcut
+        Intent intentCardBrowser = new Intent(context, CardBrowser.class);
+        intentCardBrowser.setAction(Intent.ACTION_VIEW);
+        intentCardBrowser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        ShortcutInfo cardBrowserShortcut = new ShortcutInfo.Builder(context, "cardBrowserShortcutId")
+                .setShortLabel(context.getString(R.string.card_browser))
+                .setLongLabel(context.getString(R.string.card_browser))
+                .setIcon(Icon.createWithResource(context, R.drawable.ankidroid_logo))
+                .setIntent(intentCardBrowser)
+                .build();
+
+        shortcutManager.addDynamicShortcuts(Arrays.asList(reviewCardsShortcut, NoteEditorShortcut, cardBrowserShortcut));
+
     }
 
 
@@ -291,7 +387,8 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
             if (itemId == R.id.nav_decks) {
                 Timber.i("Navigating to decks");
                 Intent deckPicker = new Intent(NavigationDrawerActivity.this, DeckPicker.class);
-                deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);    // opening DeckPicker should clear back history
+                // opening DeckPicker should use the instance on the back stack & clear back history
+                deckPicker.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivityWithAnimation(deckPicker, END);
             } else if (itemId == R.id.nav_browser) {
                 Timber.i("Navigating to card browser");
@@ -308,6 +405,10 @@ public abstract class NavigationDrawerActivity extends AnkiActivity implements N
                 // Remember the theme we started with so we can restart the Activity if it changes
                 mOldTheme = Themes.getCurrentTheme(getApplicationContext());
                 startActivityForResultWithAnimation(new Intent(NavigationDrawerActivity.this, Preferences.class), REQUEST_PREFERENCES_UPDATE, FADE);
+                // #6192 - stop crash on changing collection path - cancel tasks if moving to settings
+                if (this instanceof Statistics) {
+                    finishWithAnimation(FADE);
+                }
             } else if (itemId == R.id.nav_help) {
                 Timber.i("Navigating to help");
                 showDialogFragment(HelpDialog.createInstance(this));

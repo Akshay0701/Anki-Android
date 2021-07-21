@@ -64,7 +64,7 @@ public class AnkiStatsTaskHandler {
     }
 
     public synchronized static AnkiStatsTaskHandler getInstance(Collection collection) {
-        if (sInstance == null) {
+        if (sInstance == null || sInstance.mCollectionData != collection) {
             sInstance = new AnkiStatsTaskHandler(collection);
         }
         return sInstance;
@@ -86,7 +86,7 @@ public class AnkiStatsTaskHandler {
         return deckPreviewStatistics;
     }
 
-    private static class CreateChartTask extends AsyncTask<View, Void, PlotSheet>{
+    private static class CreateChartTask extends StatsAsyncTask<PlotSheet>{
         private WeakReference<ChartView> mImageView;
         private WeakReference<ProgressBar> mProgressBar;
         private final WeakReference<Collection> mCollectionData;
@@ -106,7 +106,7 @@ public class AnkiStatsTaskHandler {
         }
 
         @Override
-        protected PlotSheet doInBackground(View... params) {
+        protected PlotSheet doInBackgroundSafe(View... params) {
             //make sure only one task of CreateChartTask is running, first to run should get sLock
             //only necessary on lower APIs because after honeycomb only one thread is used for all asynctasks
             sLock.lock();
@@ -149,7 +149,7 @@ public class AnkiStatsTaskHandler {
         }
     }
 
-    private static class CreateStatisticsOverview extends AsyncTask<View, Void, String>{
+    private static class CreateStatisticsOverview extends StatsAsyncTask<String>{
         private WeakReference<WebView> mWebView;
         private WeakReference<ProgressBar> mProgressBar;
         private final WeakReference<Collection> mCollectionData;
@@ -167,7 +167,7 @@ public class AnkiStatsTaskHandler {
         }
 
         @Override
-        protected String doInBackground(View... params) {
+        protected String doInBackgroundSafe(View... params) {
             //make sure only one task of CreateChartTask is running, first to run should get sLock
             //only necessary on lower APIs because after honeycomb only one thread is used for all asynctasks
             sLock.lock();
@@ -220,11 +220,10 @@ public class AnkiStatsTaskHandler {
     private static class DeckPreviewStatistics extends AsyncTask<Pair<Collection, TextView>, Void, String> {
         private WeakReference<TextView> mTextView;
 
-        private boolean mIsRunning = false;
+        private boolean mIsRunning = true;
 
         public DeckPreviewStatistics() {
             super();
-            mIsRunning = true;
         }
 
         @Override
@@ -234,6 +233,10 @@ public class AnkiStatsTaskHandler {
             sLock.lock();
             try {
                 Collection collection = params[0].first;
+
+                TextView textView = params[0].second;
+                mTextView = new WeakReference<>(textView);
+
                 if (!mIsRunning || collection == null || collection.getDb() == null) {
                     Timber.d("Quitting DeckPreviewStatistics before execution");
                     return null;
@@ -241,13 +244,11 @@ public class AnkiStatsTaskHandler {
                     Timber.d("Starting DeckPreviewStatistics");
                 }
 
-                TextView textView = params[0].second;
-                mTextView = new WeakReference<>(textView);
-
                 //eventually put this in Stats (in desktop it is not though)
                 int cards;
                 int minutes;
-                String query = "select count(), sum(time)/1000 from revlog where id > " + ((collection.getSched().getDayCutoff() - SECONDS_PER_DAY) * 1000);
+                String query = "select sum(case when ease > 0 then 1 else 0 end), "+ /* cards, excludes rescheduled cards https://github.com/ankidroid/Anki-Android/issues/8592 */
+                "sum(time)/1000 from revlog where id > " + ((collection.getSched().getDayCutoff() - SECONDS_PER_DAY) * 1000);
                 Timber.d("DeckPreviewStatistics query: %s", query);
 
                 try (Cursor cur = collection.getDb()

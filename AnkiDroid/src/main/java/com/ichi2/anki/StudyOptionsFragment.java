@@ -54,7 +54,7 @@ import com.ichi2.libanki.Decks;
 import com.ichi2.libanki.Utils;
 import com.ichi2.libanki.Deck;
 import com.ichi2.themes.StyledProgressDialog;
-import com.ichi2.utils.BooleanGetter;
+import com.ichi2.utils.Computation;
 import com.ichi2.utils.FragmentFactoryUtils;
 import com.ichi2.utils.HtmlUtils;
 
@@ -163,6 +163,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
     private void openFilteredDeckOptions(boolean defaultConfig) {
         Intent i = new Intent(getActivity(), FilteredDeckOptions.class);
         i.putExtra("defaultConfig", defaultConfig);
+        Timber.i("openFilteredDeckOptions()");
         mOnDeckOptionsActivityResult.launch(i);
         ActivityTransitionAnimation.slide(getActivity(), FADE);
     }
@@ -184,6 +185,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Timber.i("onCreate()");
         super.onCreate(savedInstanceState);
         //If we're being restored, don't launch deck options again.
         if (savedInstanceState == null && getArguments() != null) {
@@ -193,6 +195,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Timber.i("onCreateView()");
         if (container == null) {
             // Currently in a layout without a container, so no reason to create our view.
             return null;
@@ -202,8 +205,8 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
         mFragmented = getActivity().getClass() != StudyOptionsActivity.class;
         initAllContentViews(studyOptionsView);
         mToolbar = studyOptionsView.findViewById(R.id.studyOptionsToolbar);
-        mToolbar.inflateMenu(R.menu.study_options_fragment);
         if (mToolbar != null) {
+            mToolbar.inflateMenu(R.menu.study_options_fragment);
             configureToolbar();
         }
         refreshInterface(true);
@@ -217,14 +220,14 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
         if (mFullNewCountThread != null) {
             mFullNewCountThread.interrupt();
         }
-        Timber.d("onDestroy()");
+        Timber.i("onDestroy()");
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        Timber.d("onResume()");
+        Timber.i("onResume()");
         refreshInterface(true);
     }
 
@@ -244,10 +247,13 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
 
 
     private void openReviewer() {
+        Timber.i("openReviewer()");
         Intent reviewer = new Intent(getActivity(), Reviewer.class);
         if (mFragmented) {
             mToReviewer = true;
+            Timber.i("openReviewer() fragmented mode");
             mOnRequestReviewActivityResult.launch(reviewer);
+            // TODO #8913 should we finish the activity here? when it comes back from review it's dead and mToolbar is null and it crashes
         } else {
             // Go to DeckPicker after studying when not tablet
             reviewer.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
@@ -302,7 +308,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
         parent.addView(newView);
     }
 
-    private final TaskListener<Card, BooleanGetter> mUndoListener = new TaskListener<Card, BooleanGetter>() {
+    private final TaskListener<Card, Computation<?>> mUndoListener = new TaskListener<Card, Computation<?>>() {
         @Override
         public void onPreExecute() {
 
@@ -310,7 +316,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
 
 
         @Override
-        public void onPostExecute(BooleanGetter v) {
+        public void onPostExecute(Computation<?> v) {
             openReviewer();
         }
     };
@@ -328,6 +334,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
                 openFilteredDeckOptions();
             } else {
                 Intent i = new Intent(getActivity(), DeckOptions.class);
+                Timber.i("Opening deck options for activity result");
                 mOnDeckOptionsActivityResult.launch(i);
                 ActivityTransitionAnimation.slide(getActivity(), FADE);
             }
@@ -374,11 +381,12 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
     // This will allow a maximum of one recur in order to workaround database closes
     // caused by sync on startup where this might be running then have the collection close
     private void configureToolbarInternal(boolean recur) {
+        Timber.i("configureToolbarInternal()");
         try {
             mToolbar.setOnMenuItemClickListener(this);
             Menu menu = mToolbar.getMenu();
             // Switch on or off rebuild/empty/custom study depending on whether or not filtered deck
-            if (getCol().getDecks().isDyn(getCol().getDecks().selected())) {
+            if (getCol() != null && getCol().getDecks().isDyn(getCol().getDecks().selected())) {
                 menu.findItem(R.id.action_rebuild).setVisible(true);
                 menu.findItem(R.id.action_empty).setVisible(true);
                 menu.findItem(R.id.action_custom_study).setVisible(false);
@@ -404,9 +412,9 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
                 menu.findItem(R.id.action_export).setVisible(false);
             }
             // Switch on or off unbury depending on if there are cards to unbury
-            menu.findItem(R.id.action_unbury).setVisible(getCol().getSched().haveBuried());
+            menu.findItem(R.id.action_unbury).setVisible(getCol() != null && getCol().getSched().haveBuried());
             // Switch on or off undo depending on whether undo is available
-            if (!getCol().undoAvailable()) {
+            if (getCol() == null || !getCol().undoAvailable()) {
                 menu.findItem(R.id.action_undo).setVisible(false);
             } else {
                 menu.findItem(R.id.action_undo).setVisible(true);
@@ -415,7 +423,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
             }
             // Set the back button listener
             if (!mFragmented) {
-                final Drawable icon = AppCompatResources.getDrawable(getContext(), R.drawable.ic_arrow_back_white_24dp);
+                final Drawable icon = AppCompatResources.getDrawable(getContext(), R.drawable.ic_arrow_back_white);
                 icon.setAutoMirrored(true);
                 mToolbar.setNavigationIcon(icon);
                 mToolbar.setNavigationOnClickListener(v -> ((AnkiActivity) getActivity()).finishWithAnimation(END));
@@ -439,7 +447,12 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
     }
 
     ActivityResultLauncher<Intent> mOnRequestReviewActivityResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        configureToolbar();
+        Timber.i("StudyOptionsFragment::mOnRequestReviewActivityResult");
+        if (mToolbar != null) {
+            configureToolbar(); // FIXME we were crashing here because mToolbar is null #8913
+        } else {
+            AnkiDroidApp.sendExceptionReport("mToolbar null after return from tablet review session? Issue 8913", "StudyOptionsFragment");
+        }
         if ((result.getResultCode() == DeckPicker.RESULT_DB_ERROR) || (result.getResultCode() == DeckPicker.RESULT_MEDIA_EJECTED)) {
             closeStudyOptions(result.getResultCode());
             return;
@@ -454,6 +467,7 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
     });
 
     ActivityResultLauncher<Intent> mOnDeckOptionsActivityResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        Timber.i("StudyOptionsFragment::mOnDeckOptionsActivityResult");
         configureToolbar();
         if ((result.getResultCode() == DeckPicker.RESULT_DB_ERROR) || (result.getResultCode() == DeckPicker.RESULT_MEDIA_EJECTED)) {
             closeStudyOptions(result.getResultCode());
@@ -726,8 +740,13 @@ public class StudyOptionsFragment extends Fragment implements Toolbar.OnMenuItem
         return HtmlCompat.fromHtml(withFixedNewlines, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
-    private Collection getCol() {
-        return CollectionHelper.getInstance().getCol(getContext());
+    private @Nullable Collection getCol() {
+        try {
+            return CollectionHelper.getInstance().getCol(getContext());
+        } catch (Exception e) {
+            // This may happen if the backend is locked or similar.
+        }
+        return null;
     }
 
 

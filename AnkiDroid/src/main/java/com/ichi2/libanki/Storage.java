@@ -32,6 +32,7 @@ import com.ichi2.utils.JSONException;
 import com.ichi2.utils.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -57,8 +58,13 @@ public class Storage {
     /** Helper method for when the collection can't be opened */
     public static int getDatabaseVersion(String path) throws UnknownDatabaseVersionException {
         try {
+            if (!new File(path).exists()) {
+                throw new UnknownDatabaseVersionException(new FileNotFoundException(path));
+            }
             DB db = new DB(path);
-            return db.queryScalar("SELECT ver FROM col");
+            int result = db.queryScalar("SELECT ver FROM col");
+            db.close();
+            return result;
         } catch (Exception e) {
             Timber.w(e, "Can't open database");
             throw new UnknownDatabaseVersionException(e);
@@ -95,6 +101,7 @@ public class Storage {
                 for (int i = StdModels.STD_MODELS.length-1; i>=0; i--) {
                     StdModels.STD_MODELS[i].add(col);
                 }
+                col.onCreate();
                 col.save();
             }
             return col;
@@ -397,5 +404,10 @@ public class Storage {
 
     public static void setUseInMemory(boolean useInMemoryDatabase) {
         sUseInMemory = useInMemoryDatabase;
+    }
+
+
+    public static boolean isInMemory() {
+        return sUseInMemory;
     }
 }

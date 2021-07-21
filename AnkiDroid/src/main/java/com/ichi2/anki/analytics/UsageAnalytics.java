@@ -88,7 +88,9 @@ public class UsageAnalytics {
         setOptIn(userPrefs.getBoolean(ANALYTICS_OPTIN_KEY, false));
         userPrefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
             if (key.equals(ANALYTICS_OPTIN_KEY)) {
-                setOptIn(sharedPreferences.getBoolean(key, false));
+                boolean newValue = sharedPreferences.getBoolean(key, false);
+                Timber.i("Setting analytics opt-in to: %b", newValue);
+                setOptIn(newValue);
             }
         });
 
@@ -357,6 +359,13 @@ public class UsageAnalytics {
         return userPrefs.getBoolean(ANALYTICS_OPTIN_KEY, false);
     }
 
+    public static void setEnabled(boolean value) {
+        // A listener on this preference handles the rest
+        AnkiDroidApp.getSharedPrefs(AnkiDroidApp.getInstance()).edit()
+                .putBoolean(UsageAnalytics.ANALYTICS_OPTIN_KEY, value)
+                .apply();
+    }
+
 
 
     public static class Category {
@@ -381,6 +390,14 @@ public class UsageAnalytics {
         public static final String OPENED_SUPPORT_ANKIDROID = "Opened Support AnkiDroid";
         @AnalyticsConstant
         public static final String OPENED_COMMUNITY = "Opened Community";
+        @AnalyticsConstant
+        public static final String OPENED_PRIVACY = "Opened Privacy";
+        @AnalyticsConstant
+        public static final String OPENED_ANKIWEB_TERMS_AND_CONDITIONS = "Opened AnkiWeb Terms and Conditions";
+        @AnalyticsConstant
+        public static final String OPENED_ANKIDROID_PRIVACY_POLICY = "Opened AnkiDroid Privacy Policy";
+        @AnalyticsConstant
+        public static final String OPENED_ANKIWEB_PRIVACY_POLICY = "Opened AnkiWeb Privacy Policy";
         @AnalyticsConstant
         public static final String OPENED_ANKIDROID_MANUAL = "Opened AnkiDroid Manual";
         @AnalyticsConstant
