@@ -101,7 +101,6 @@ public class FieldEditLine extends FrameLayout {
         }
 
         this.mExpansionState = ExpansionState.EXPANDED;
-
         setExpanderBackgroundImage();
         mExpandButton.setOnClickListener((v) -> toggleExpansionState());
         mEditText.init();
